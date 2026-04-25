@@ -137,26 +137,43 @@ export const AuthProvider = ({ children }) => {
       }
 
       // 6. Fetch WardBoy Tasks
-      const { data: tasksData, error: tasksError } = await supabase.from('wardboytasks').select('*');
-      if (!tasksError && tasksData) {
-        setTasks(tasksData.map(t => {
-          const wId = t.wardbid || t.WardBid || t.wardboyId || t.wardboy_id;
-          const wName = t.wardboy?.wardbname || (wardboys || []).find(wb => String(wb.wardbid || wb.WardBid || wb.wardboy_id) === String(wId))?.wardbname;
-          return {
-            id: t.taskid || t.TaskId || t.task_id || t.id,
-            wardboyId: wId,
-            wardboyName: wName || 'Unknown Wardboy',
-            assignedByRole: t.assignedbyrole || t.AssignedByRole || t.assigned_by_role,
-            assignedByName: t.assignedbyname || t.AssignedByName || t.assigned_by_name,
-            description: t.taskdescription || t.TaskDescription || t.task_description,
-            status: t.status || t.Status,
-            createdAt: t.createdat || t.CreatedAt || t.created_at
-          };
-        }));
-      }
+      await fetchTasksOnly(wardboys);
 
     } catch (err) {
       console.error("Error fetching data:", err);
+    }
+  };
+
+  // Lightweight function to fetch ONLY tasks (avoids re-fetching all tables)
+  const fetchTasksOnly = async (wardboysOverride) => {
+    try {
+      const { data: tasksData, error: tasksError } = await supabase.from('wardboytasks').select('*');
+      if (tasksError) {
+        console.error('fetchTasksOnly error:', tasksError.message);
+        return;
+      }
+      // Get wardboy names for display
+      let wbList = wardboysOverride;
+      if (!wbList) {
+        const { data: wbData } = await supabase.from('wardboy').select('wardbid, wardbname');
+        wbList = wbData || [];
+      }
+      setTasks((tasksData || []).map(t => {
+        const wId = t.wardbid || t.WardBid || t.wardboyId || t.wardboy_id;
+        const wName = (wbList || []).find(wb => String(wb.wardbid || wb.WardBid || wb.wardboy_id) === String(wId))?.wardbname;
+        return {
+          id: t.taskid || t.TaskId || t.task_id || t.id,
+          wardboyId: wId,
+          wardboyName: wName || 'Unknown Wardboy',
+          assignedByRole: t.assignedbyrole || t.AssignedByRole || t.assigned_by_role,
+          assignedByName: t.assignedbyname || t.AssignedByName || t.assigned_by_name,
+          description: t.taskdescription || t.TaskDescription || t.task_description,
+          status: t.status || t.Status,
+          createdAt: t.createdat || t.CreatedAt || t.created_at
+        };
+      }));
+    } catch (err) {
+      console.error('fetchTasksOnly error:', err);
     }
   };
 
@@ -195,9 +212,22 @@ export const AuthProvider = ({ children }) => {
       // SIGNED_IN is handled by the login() function directly
     });
 
+    // Step 3: Realtime subscription for wardboytasks - instant updates across browsers
+    const tasksChannel = supabase
+      .channel('wardboytasks-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wardboytasks' }, () => {
+        // Any INSERT, UPDATE, or DELETE on wardboytasks triggers a lightweight refresh
+        if (mounted) {
+          console.log('[Realtime] wardboytasks changed, refreshing tasks...');
+          fetchTasksOnly();
+        }
+      })
+      .subscribe();
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      supabase.removeChannel(tasksChannel);
     };
   }, []);
 
@@ -327,6 +357,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const assignTask = async (wardboyId, description, assignedByRole, assignedByName) => {
+    const wName = users.find(u => u.role === 'wardboy' && String(u.id) === String(wardboyId))?.name;
+    
+    // Optimistic UI: show the task immediately in the assigner's view
+    const optimisticTask = {
+      id: `temp-${Date.now()}`,
+      wardboyId,
+      wardboyName: wName || 'Unknown Wardboy',
+      assignedByRole,
+      assignedByName,
+      description,
+      status: 'Pending',
+      createdAt: new Date().toISOString()
+    };
+    setTasks(prev => [...prev, optimisticTask]);
+
     const payload = {
         wardbid: parseInt(wardboyId, 10),
         taskdescription: description,
@@ -336,30 +381,26 @@ export const AuthProvider = ({ children }) => {
     const { error } = await supabase.from('wardboytasks').insert([payload]);
     if (error) {
       console.error('assignTask error:', error.message);
-      const wName = users.find(u => u.role === 'wardboy' && String(u.id) === String(wardboyId))?.name;
-      setTasks(prev => [...prev, {
-        id: Date.now(),
-        wardboyId,
-        wardboyName: wName || 'Unknown Wardboy',
-        assignedByRole,
-        assignedByName,
-        description,
-        status: 'Pending',
-        createdAt: new Date().toISOString()
-      }]);
+      // Keep the optimistic task as fallback
     } else {
-      await fetchAllData();
+      // Lightweight refresh to replace optimistic task with real DB row
+      // (Realtime subscription will also trigger this for other browsers)
+      await fetchTasksOnly();
     }
   };
 
   const updateTaskStatus = async (taskId, newStatus) => {
-    // Optimistic UI update
+    // Optimistic UI update — task stays visible with new status
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
     
     const { error } = await supabase.from('wardboytasks').update({ status: newStatus }).eq('taskid', taskId);
     if (error) {
       console.error('Failed to update task status:', error.message);
-      // We could revert the optimistic update here if needed, but logging is fine for now
+      // Revert optimistic update on failure
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: 'Pending' } : t));
+    } else {
+      // Sync from DB to ensure consistency (completed tasks stay in the list)
+      await fetchTasksOnly();
     }
   };
 

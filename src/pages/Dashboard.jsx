@@ -680,14 +680,17 @@ const PatientView = () => {
 
 const WardBoyView = () => {
   const { tasks, user } = useAuth();
-  const pendingTasks = tasks.filter(t => t.wardboyId?.toString() === user.id?.toString() && t.status === 'Pending');
+  const myTasks = tasks.filter(t => t.wardboyId?.toString() === user.id?.toString());
+  const pendingTasks = myTasks.filter(t => t.status === 'Pending');
+  const completedTasks = myTasks.filter(t => t.status === 'Completed');
 
   return (
     <div>
       <h3 style={{color: '#112A46', fontSize: '1.6rem', marginBottom: '20px'}}>Ward Staff View</h3>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <StatCard title="Pending Tasks" value={pendingTasks.length.toString()} />
-        <StatCard title="Shift Status" value="On Duty" color="#16a34a" />
+        <StatCard title="Pending Tasks" value={pendingTasks.length.toString()} color="#d97706" />
+        <StatCard title="Completed Tasks" value={completedTasks.length.toString()} color="#16a34a" />
+        <StatCard title="Shift Status" value="On Duty" color="#0284c7" />
       </div>
       <TaskManagement canAssign={false} />
     </div>
@@ -705,11 +708,15 @@ const TaskManagement = ({ canAssign = false }) => {
   const { tasks, users, user, assignTask, updateTaskStatus } = useAuth();
   const [description, setDescription] = useState('');
   const [wardboyId, setWardboyId] = useState('');
+  const [activeTab, setActiveTab] = useState('active');
 
   const wardboys = users.filter(u => u.role === ROLES.WARDBOY);
   
   // If user is wardboy, show only their tasks, else show all
-  const filteredTasks = user.role === ROLES.WARDBOY ? tasks.filter(t => t.wardboyId?.toString() === user.id?.toString()) : tasks;
+  const allTasks = user.role === ROLES.WARDBOY ? tasks.filter(t => t.wardboyId?.toString() === user.id?.toString()) : tasks;
+  const activeTasks = allTasks.filter(t => t.status === 'Pending');
+  const completedTasks = allTasks.filter(t => t.status === 'Completed');
+  const displayedTasks = activeTab === 'active' ? activeTasks : completedTasks;
 
   const handleAssign = (e) => {
     e.preventDefault();
@@ -719,6 +726,18 @@ const TaskManagement = ({ canAssign = false }) => {
     setWardboyId('');
     alert('Task assigned successfully!');
   };
+
+  const tabStyle = (isActive) => ({
+    padding: '10px 24px',
+    border: 'none',
+    borderBottom: isActive ? '3px solid #112A46' : '3px solid transparent',
+    background: 'transparent',
+    color: isActive ? '#112A46' : '#94a3b8',
+    fontWeight: isActive ? '600' : '400',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  });
 
   return (
     <div style={{ marginTop: '40px' }}>
@@ -737,6 +756,16 @@ const TaskManagement = ({ canAssign = false }) => {
         </form>
       )}
 
+      {/* Tab switcher: Active Tasks / History */}
+      <div style={{ display: 'flex', gap: '0', borderBottom: '2px solid #f0f0f0', marginBottom: '0' }}>
+        <button style={tabStyle(activeTab === 'active')} onClick={() => setActiveTab('active')}>
+          Active Tasks ({activeTasks.length})
+        </button>
+        <button style={tabStyle(activeTab === 'history')} onClick={() => setActiveTab('history')}>
+          History ({completedTasks.length})
+        </button>
+      </div>
+
       <div className="sleek-table-container">
         <table className="sleek-table">
           <thead>
@@ -745,13 +774,15 @@ const TaskManagement = ({ canAssign = false }) => {
               <th>Assigned To</th>
               <th>Assigned By</th>
               <th>Status</th>
-              <th>Action</th>
+              {activeTab === 'active' && <th>Action</th>}
             </tr>
           </thead>
           <tbody>
-            {filteredTasks.length === 0 ? (
-              <tr><td colSpan="5" style={{textAlign:'center', color:'#888'}}>No tasks available.</td></tr>
-            ) : filteredTasks.map(t => (
+            {displayedTasks.length === 0 ? (
+              <tr><td colSpan={activeTab === 'active' ? "5" : "4"} style={{textAlign:'center', color:'#888', padding: '30px'}}>
+                {activeTab === 'active' ? 'No pending tasks.' : 'No completed tasks yet.'}
+              </td></tr>
+            ) : displayedTasks.map(t => (
               <tr key={t.id}>
                 <td>{t.description}</td>
                 <td style={{textTransform:'capitalize'}}>{t.wardboyName || 'Unknown Wardboy'}</td>
@@ -761,11 +792,13 @@ const TaskManagement = ({ canAssign = false }) => {
                     {t.status}
                   </span>
                 </td>
-                <td>
-                  {user.role === ROLES.WARDBOY && t.status === 'Pending' ? (
-                    <button className="action-btn primary" onClick={() => updateTaskStatus(t.id, 'Completed')}>Mark Completed</button>
-                  ) : <span style={{color: '#aaa'}}>-</span>}
-                </td>
+                {activeTab === 'active' && (
+                  <td>
+                    {user.role === ROLES.WARDBOY && t.status === 'Pending' ? (
+                      <button className="action-btn primary" onClick={() => updateTaskStatus(t.id, 'Completed')}>Mark Completed</button>
+                    ) : <span style={{color: '#aaa'}}>-</span>}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
