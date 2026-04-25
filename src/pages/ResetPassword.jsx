@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { backend } from '../backend';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './SharedPages.css';
+
+const getResetTokenFromLocation = (search, hash) => {
+  const searchToken = new URLSearchParams(search).get('token');
+  if (searchToken) return searchToken;
+
+  const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
+  return new URLSearchParams(hashQuery).get('token') || '';
+};
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -11,27 +19,35 @@ const ResetPassword = () => {
   const [status, setStatus] = useState('idle'); // idle | loading | success | error | invalid
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const resetToken = useMemo(
+    () => getResetTokenFromLocation(location.search, typeof window === 'undefined' ? '' : window.location.hash),
+    [location.search]
+  );
 
   useEffect(() => {
-    // Supabase puts the session tokens in the URL hash after clicking the email link.
-    // We need to let the supabase client parse it by checking the session.
-    const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error || !data.session) {
+    const validate = async () => {
+      const validation = await backend.validateResetToken(resetToken);
+      if (!validation.success) {
         setStatus('invalid');
-        setMessage('This reset link is invalid or has expired. Please request a new one.');
+        setMessage(validation.message || 'This reset link is invalid or has expired.');
       }
     };
-    checkSession();
-  }, []);
+
+    if (resetToken) {
+      validate();
+    }
+  }, [resetToken]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       setStatus('error');
       setMessage('Passwords do not match. Please try again.');
       return;
     }
+
     if (password.length < 6) {
       setStatus('error');
       setMessage('Password must be at least 6 characters long.');
@@ -41,20 +57,19 @@ const ResetPassword = () => {
     setStatus('loading');
     setMessage('');
 
-    const { error } = await supabase.auth.updateUser({ password });
+    const result = await backend.resetPassword(resetToken, password);
 
-    if (error) {
+    if (!result.success) {
       setStatus('error');
-      setMessage(error.message || 'Failed to update password. Please try again.');
-    } else {
-      setStatus('success');
-      setMessage('Your password has been updated successfully!');
-      // Sign out the temporary reset session and redirect to login
-      setTimeout(async () => {
-        await supabase.auth.signOut();
-        navigate('/login');
-      }, 2500);
+      setMessage(result.message || 'Failed to update password. Please try again.');
+      return;
     }
+
+    setStatus('success');
+    setMessage('Your password has been updated successfully!');
+    setTimeout(() => {
+      navigate('/login');
+    }, 2500);
   };
 
   if (status === 'invalid') {
@@ -65,7 +80,7 @@ const ResetPassword = () => {
           <h1>Invalid Link</h1>
         </header>
         <main className="form-container" style={{ textAlign: 'center', padding: '40px' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '20px' }}>⚠️</div>
+          <div style={{ fontSize: '2.2rem', marginBottom: '20px', color: '#ff4d4d' }}>Invalid</div>
           <p style={{ color: '#ff4d4d', marginBottom: '20px' }}>{message}</p>
           <Link to="/forgot-password">
             <button className="submit-btn" style={{ maxWidth: '220px', margin: '0 auto' }}>
@@ -86,8 +101,8 @@ const ResetPassword = () => {
           <h1>Password Updated!</h1>
         </header>
         <main className="form-container" style={{ textAlign: 'center', padding: '40px' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '20px' }}>✅</div>
-          <h3 style={{ color: '#00b4db', marginBottom: '10px' }}>Success!</h3>
+          <div style={{ fontSize: '2.2rem', marginBottom: '20px', color: '#00b4db' }}>Success</div>
+          <h3 style={{ color: '#00b4db', marginBottom: '10px' }}>Password changed</h3>
           <p style={{ color: '#555' }}>{message}</p>
           <p style={{ color: '#888', fontSize: '0.9rem' }}>Redirecting to login...</p>
         </main>
@@ -101,7 +116,7 @@ const ResetPassword = () => {
       <Navbar />
       <header className="page-header">
         <h1>Set New Password</h1>
-        <p>Choose a strong password for your account.</p>
+        <p>Choose a strong password for your local CareSphere account.</p>
       </header>
 
       <main className="form-container">
@@ -112,7 +127,7 @@ const ResetPassword = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter new password"
               required
               minLength={6}
               disabled={status === 'loading'}
@@ -125,7 +140,7 @@ const ResetPassword = () => {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Confirm new password"
               required
               minLength={6}
               disabled={status === 'loading'}
@@ -133,15 +148,17 @@ const ResetPassword = () => {
           </div>
 
           {status === 'error' && (
-            <p style={{
-              color: '#ff4d4d',
-              marginBottom: '15px',
-              textAlign: 'center',
-              padding: '10px',
-              background: 'rgba(255,77,77,0.1)',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,77,77,0.3)'
-            }}>
+            <p
+              style={{
+                color: '#ff4d4d',
+                marginBottom: '15px',
+                textAlign: 'center',
+                padding: '10px',
+                background: 'rgba(255,77,77,0.1)',
+                borderRadius: '8px',
+                border: '1px solid rgba(255,77,77,0.3)'
+              }}
+            >
               {message}
             </p>
           )}
@@ -157,7 +174,7 @@ const ResetPassword = () => {
 
           <p style={{ textAlign: 'center' }}>
             <Link to="/login" style={{ color: '#00b4db', fontWeight: 'bold' }}>
-              Cancel — Back to Login
+              Cancel - Back to Login
             </Link>
           </p>
         </form>

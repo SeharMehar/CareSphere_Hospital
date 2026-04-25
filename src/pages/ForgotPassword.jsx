@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import { buildAppUrl } from '../appUrl';
+import { backend } from '../backend';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './SharedPages.css';
@@ -9,23 +10,31 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [message, setMessage] = useState('');
+  const [resetLink, setResetLink] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     setMessage('');
+    setResetLink('');
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const result = await backend.requestPasswordReset(email);
 
-    if (error) {
+    if (!result.success) {
       setStatus('error');
-      setMessage(error.message || 'Failed to send reset email. Please try again.');
-    } else {
-      setStatus('success');
-      setMessage(`A password reset link has been sent to ${email}. Please check your inbox.`);
+      setMessage(result.message || 'Failed to create reset link. Please try again.');
+      return;
     }
+
+    setStatus('success');
+    setResetLink(
+      result.resetLink
+        ? buildAppUrl(result.resetLink)
+        : result.token
+        ? buildAppUrl(`/reset-password?token=${result.token}`)
+        : ''
+    );
+    setMessage(result.message || `Password reset instructions have been sent to ${email}.`);
   };
 
   return (
@@ -33,17 +42,31 @@ const ForgotPassword = () => {
       <Navbar />
       <header className="page-header">
         <h1>Reset Password</h1>
-        <p>Enter your email and we'll send you a reset link.</p>
+        <p>Enter your email and we will send password reset instructions.</p>
       </header>
 
       <main className="form-container">
         {status === 'success' ? (
           <div style={{ textAlign: 'center', padding: '30px' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '20px' }}>📧</div>
-            <h3 style={{ color: '#00b4db', marginBottom: '10px' }}>Check your inbox!</h3>
+            <div style={{ fontSize: '2.2rem', marginBottom: '20px', color: '#00b4db' }}>Reset Link</div>
+            <h3 style={{ color: '#00b4db', marginBottom: '10px' }}>Link ready</h3>
             <p style={{ color: '#555', marginBottom: '20px' }}>{message}</p>
+            {resetLink && (
+              <a
+                href={resetLink}
+                style={{
+                  display: 'block',
+                  wordBreak: 'break-all',
+                  color: '#00b4db',
+                  fontWeight: 'bold',
+                  marginBottom: '20px'
+                }}
+              >
+                {resetLink}
+              </a>
+            )}
             <Link to="/login">
-              <button className="submit-btn" style={{ maxWidth: '200px', margin: '0 auto' }}>
+              <button className="submit-btn" style={{ maxWidth: '220px', margin: '0 auto' }}>
                 Back to Login
               </button>
             </Link>
@@ -63,15 +86,17 @@ const ForgotPassword = () => {
             </div>
 
             {status === 'error' && (
-              <p style={{
-                color: '#ff4d4d',
-                marginBottom: '15px',
-                textAlign: 'center',
-                padding: '10px',
-                background: 'rgba(255,77,77,0.1)',
-                borderRadius: '8px',
-                border: '1px solid rgba(255,77,77,0.3)'
-              }}>
+              <p
+                style={{
+                  color: '#ff4d4d',
+                  marginBottom: '15px',
+                  textAlign: 'center',
+                  padding: '10px',
+                  background: 'rgba(255,77,77,0.1)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,77,77,0.3)'
+                }}
+              >
                 {message}
               </p>
             )}
@@ -82,7 +107,7 @@ const ForgotPassword = () => {
               disabled={status === 'loading'}
               style={{ marginBottom: '15px' }}
             >
-              {status === 'loading' ? 'Sending...' : 'Send Reset Link'}
+              {status === 'loading' ? 'Generating...' : 'Generate Reset Link'}
             </button>
 
             <p style={{ textAlign: 'center' }}>

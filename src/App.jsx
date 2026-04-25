@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -16,14 +16,21 @@ import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
 
 function App() {
-  const routerBasename =
-    import.meta.env.BASE_URL === '/'
-      ? undefined
-      : import.meta.env.BASE_URL.replace(/\/$/, '');
+  const useHashRouter =
+    import.meta.env.PROD && import.meta.env.BASE_URL !== '/';
+  const Router = useHashRouter ? HashRouter : BrowserRouter;
+  const routerProps = useHashRouter
+    ? {}
+    : {
+        basename:
+          import.meta.env.BASE_URL === '/'
+            ? undefined
+            : import.meta.env.BASE_URL.replace(/\/$/, ''),
+      };
 
   return (
     <AuthProvider>
-      <Router basename={routerBasename}>
+      <Router {...routerProps}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

@@ -88,7 +88,7 @@ const Users = () => {
 
     // First, handle role change if changed (Admins only)
     if (editDetails.role !== selectedUser.role && user.role === ROLES.ADMIN) {
-      await updateUserRole(selectedUser.id, editDetails.role);
+      await updateUserRole(selectedUser.id, selectedUser.role, editDetails.role);
     }
 
     // Now construct payload based on role

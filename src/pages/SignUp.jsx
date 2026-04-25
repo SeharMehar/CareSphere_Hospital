@@ -32,6 +32,10 @@ const SignUp = () => {
     const res = await signup(formData);
     setIsSubmitting(false);
     if (res.success) {
+      if (res.autoSignedIn) {
+        navigate('/dashboard', { replace: true });
+        return;
+      }
       setSuccessMsg(res.message || 'Account created! Please check your email to verify your account, then log in.');
     } else {
       setErrorMsg(res.message || 'Signup failed. Please try again.');
@@ -43,7 +47,7 @@ const SignUp = () => {
       <Navbar />
       <header className="page-header">
         <h1>Patient Registration</h1>
-        <p>Create your patient portal account to book appointments and view records.</p>
+        <p>Create your patient portal account with your email. Extra health details are optional and can be added later.</p>
       </header>
 
       <main className="form-container" style={{maxWidth: '800px'}}>
@@ -66,7 +70,7 @@ const SignUp = () => {
 
           <div className="form-group" style={{marginBottom: 0}}>
             <label>Gender</label>
-            <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})} required >
+            <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})}>
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
@@ -76,30 +80,30 @@ const SignUp = () => {
 
           <div className="form-group" style={{marginBottom: 0}}>
             <label>Date of Birth</label>
-            <input type="date" value={formData.dob} onChange={(e) => setFormData({...formData, dob: e.target.value})} required />
+            <input type="date" value={formData.dob} onChange={(e) => setFormData({...formData, dob: e.target.value})} />
           </div>
 
           <div className="form-group" style={{marginBottom: 0}}>
-            <label>Phone Number</label>
-            <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} required />
+            <label>Phone Number (Optional)</label>
+            <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
           </div>
 
           <div className="form-group" style={{marginBottom: 0}}>
-            <label>Blood Group</label>
-            <select value={formData.bloodGroup} onChange={(e) => setFormData({...formData, bloodGroup: e.target.value})} required >
+            <label>Blood Group (Optional)</label>
+            <select value={formData.bloodGroup} onChange={(e) => setFormData({...formData, bloodGroup: e.target.value})}>
               <option value="">Select Blood Group</option>
               {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
             </select>
           </div>
 
           <div className="form-group" style={{gridColumn: '1 / -1', marginBottom: 0}}>
-            <label>Home Address</label>
-            <input type="text" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} required />
+            <label>Home Address (Optional)</label>
+            <input type="text" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
           </div>
 
           <div className="form-group" style={{marginBottom: 0}}>
-            <label>Emergency Contact Phone</label>
-            <input type="tel" value={formData.emergencyPhone} onChange={(e) => setFormData({...formData, emergencyPhone: e.target.value})} required />
+            <label>Emergency Contact Phone (Optional)</label>
+            <input type="tel" value={formData.emergencyPhone} onChange={(e) => setFormData({...formData, emergencyPhone: e.target.value})} />
           </div>
 
           <div className="form-group" style={{marginBottom: 0}}>
