@@ -28,7 +28,7 @@ CareSphere is a comprehensive, real-time Hospital Management System built with *
 | Routing | react-router-dom v7 |
 | Backend & Database | Supabase (PostgreSQL + Auth + Realtime) |
 | State Management | React Context API (`AuthContext.jsx`) |
-| Deployment | Vercel (SPA rewrites) |
+| Deployment | GitHub Pages (via `gh-pages`) |
 
 ---
 
@@ -36,7 +36,7 @@ CareSphere is a comprehensive, real-time Hospital Management System built with *
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/musman2403/caresphere.git
+git clone 
 cd caresphere
 npm install
 ```
@@ -44,8 +44,8 @@ npm install
 ### 2. Configure Environment
 Create a `.env` file in the project root:
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=https://jbxvbmrfcwjpcleamafu.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 3. Database Setup
@@ -167,7 +167,6 @@ caresphere/
 ├── setup_wardboy_tasks.sql      # Task table + Realtime setup
 ├── fix_rls_policies.sql         # Row Level Security config
 ├── seed_data.sql                # Sample data for development
-├── vercel.json                  # Vercel SPA deployment config
 ├── package.json
 └── README.md
 ```
@@ -200,11 +199,11 @@ npm run preview     # Preview production build locally
 npm run lint        # Run ESLint
 ```
 
-**Vercel:** Push to GitHub → connect repo in Vercel → auto-deploys with SPA rewrites.
+**GitHub Pages:** Build locally and deploy with `npm run deploy`.
 
 ---
 
 ## Author
 
-**Muhammad Usman**  
-GitHub: [@musman2403](https://github.com/musman2403)
+**Sehar Mehar**  
+GitHub: [@seharmehar](https://github.com/seharmehar)

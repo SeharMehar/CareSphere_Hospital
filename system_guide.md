@@ -15,7 +15,7 @@
 | Backend/DB | Supabase (PostgreSQL + Auth + Realtime) |
 | State Management | React Context API (`AuthContext.jsx`) |
 | Styling | Vanilla CSS (glassmorphism, responsive) |
-| Deployment | Vercel (SPA with `vercel.json` rewrites) |
+| Deployment | GitHub Pages (via `gh-pages`) |
 
 ---
 
@@ -401,16 +401,16 @@ Confirmed Approved  Canceled/Rejected
 
 ### Local Setup
 ```bash
-git clone https://github.com/musman2403/caresphere.git
-cd caresphere
+git clone https://github.com/SeharMehar/CareSphere_Hospital.git
+cd CareSphere_Hospital
 npm install
 npm run dev         # Starts Vite dev server on http://localhost:5173
 ```
 
 ### Environment Variables (`.env`)
 ```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key
+VITE_SUPABASE_URL=https://jbxvbmrfcwjpcleamafu.supabase.co
+VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
 ### Production Build
@@ -419,11 +419,8 @@ npm run build       # Outputs to /dist
 npm run preview     # Preview production build locally
 ```
 
-### Vercel Deployment
-The `vercel.json` file includes SPA rewrite rules:
-```json
-{ "rewrites": [{ "source": "/(.*)", "destination": "/" }] }
-```
+### GitHub Pages Deployment
+Use `npm run deploy` to publish the built site to GitHub Pages.
 
 ---
 
