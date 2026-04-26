@@ -36,7 +36,7 @@ CareSphere is a comprehensive, real-time Hospital Management System built with *
 
 ### 1. Clone & Install
 ```bash
-git clone 
+git clone https://github.com/SeharMehar/CareSphere_Hospital.git
 cd caresphere
 npm install
 ```
@@ -45,7 +45,7 @@ npm install
 Create a `.env` file in the project root:
 ```env
 VITE_SUPABASE_URL=https://jbxvbmrfcwjpcleamafu.supabase.co
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_ANON_KEY=sb_publishable_yInf-fu43Q-04yNoC94jHg_BdFsMsCe
 ```
 
 ### 3. Database Setup
@@ -59,7 +59,7 @@ Run the following SQL scripts in your **Supabase SQL Editor**, in order:
 ```bash
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [ http://localhost:5173/CareSphere_Hospital/]( http://localhost:5173/CareSphere_Hospital/) in your browser.
 
 ---
 
@@ -206,4 +206,4 @@ npm run lint        # Run ESLint
 ## Author
 
 **Sehar Mehar**  
-GitHub: [@seharmehar](https://github.com/seharmehar)
+GitHub: [@SeharMehar](https://github.com/SeharMehar/CareSphere_Hospital.git)
