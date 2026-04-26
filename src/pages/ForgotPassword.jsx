@@ -42,7 +42,7 @@ const ForgotPassword = () => {
       <Navbar />
       <header className="page-header">
         <h1>Reset Password</h1>
-        <p>Enter your email and we will send password reset instructions.</p>
+        <p>Enter your email for a reset link.</p>
       </header>
 
       <main className="form-container">
@@ -107,7 +107,7 @@ const ForgotPassword = () => {
               disabled={status === 'loading'}
               style={{ marginBottom: '15px' }}
             >
-              {status === 'loading' ? 'Generating...' : 'Generate Reset Link'}
+              {status === 'loading' ? 'Sending...' : 'Send Reset Link'}
             </button>
 
             <p style={{ textAlign: 'center' }}>

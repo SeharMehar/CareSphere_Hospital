@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { backend } from '../backend';
 
@@ -47,11 +48,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      let result = await backend.login(email, password);
-
-      if (!result.success && result.code === 'NOT_FOUND' && backend.createQuickPatientAccess) {
-        result = await backend.createQuickPatientAccess(email, password);
-      }
+      const result = await backend.login(email, password);
 
       await syncState();
 
@@ -66,16 +63,28 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('[Login] Unexpected error:', error);
-      return { success: false, message: 'An unexpected error occurred. Please try again.' };
+      return {
+        success: false,
+        message: error?.message || 'An unexpected error occurred. Please try again.'
+      };
     } finally {
       setLoading(false);
     }
   };
 
   const signup = async (userData) => {
-    const result = await backend.signupPatient(userData);
-    await syncState();
-    return result;
+    try {
+      const signupHandler = backend.signupUser || backend.signupPatient;
+      const result = await signupHandler(userData);
+      await syncState();
+      return result;
+    } catch (error) {
+      console.error('[Signup] Unexpected error:', error);
+      return {
+        success: false,
+        message: error?.message || 'An unexpected error occurred while creating the account.'
+      };
+    }
   };
 
   const logout = async () => {

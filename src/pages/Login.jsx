@@ -7,6 +7,7 @@ import Loader from '../components/Loader';
 import './SharedPages.css';
 
 const Login = () => {
+  const hasPrimaryAdmin = Boolean((import.meta.env.VITE_PRIMARY_ADMIN_EMAIL || '').trim());
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,6 +30,7 @@ const Login = () => {
     setIsSubmitting(true);
 
     const res = await login(email, password);
+    setIsSubmitting(false);
 
     if (!res.success) {
       if (res.accountCreated) {
@@ -36,7 +38,7 @@ const Login = () => {
       } else {
         setError(res.message || 'Login failed. Please check your credentials.');
       }
-      setIsSubmitting(false);
+      return;
     }
     // On success, the user state change in context triggers the useEffect above
   };
@@ -51,7 +53,7 @@ const Login = () => {
       <Navbar />
       <header className="page-header">
         <h1>CareSphere Login</h1>
-        <p>Enter your email and password. If it is your first time, we will create a patient account for you automatically.</p>
+        <p>Use your email and password. Verify email after signup.</p>
       </header>
 
       <main className="form-container">
@@ -84,15 +86,15 @@ const Login = () => {
           {error && <p style={{color: '#ff4d4d', marginBottom: '15px', textAlign: 'center', padding: '10px', background: 'rgba(255,77,77,0.1)', borderRadius: '8px', border: '1px solid rgba(255,77,77,0.3)'}}>{error}</p>}
 
           <button type="submit" className="submit-btn" disabled={isSubmitting} style={{marginBottom: '15px'}}>
-            {isSubmitting ? 'Checking account...' : 'Continue with Email'}
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
 
           <p style={{textAlign: 'center', color: '#94a3b8', fontSize: '0.92rem', marginBottom: '15px'}}>
-            Existing users will log in normally. New email users will get quick patient access.
+            New users sign up first{hasPrimaryAdmin ? '. Admin uses reserved email.' : '.'}
           </p>
 
           <p style={{textAlign: 'center', marginBottom: '8px'}}>
-            <Link to="/forgot-password" style={{color: '#aaa', fontSize: '0.9rem'}}>Forgot your password?</Link>
+            <Link to="/forgot-password" style={{color: '#aaa', fontSize: '0.9rem'}}>Forgot Password?</Link>
           </p>
           <p style={{textAlign: 'center'}}>
             Don't have an account? <Link to="/signup" style={{color: '#00b4db', fontWeight: 'bold'}}>Sign Up</Link>

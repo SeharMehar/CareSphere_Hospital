@@ -53,7 +53,7 @@ const readJson = (key, fallback) => {
     }
 
     return JSON.parse(raw);
-  } catch (error) {
+  } catch {
     return typeof fallback === 'function' ? fallback() : deepClone(fallback);
   }
 };
@@ -86,246 +86,273 @@ const createFutureDate = (daysAhead, hours, minutes) => {
   return date.toISOString();
 };
 
-const createSeedDatabase = () => {
-  const departments = DEPARTMENTS.map((name, index) => ({
+const createSeedDepartments = () =>
+  DEPARTMENTS.map((name, index) => ({
     depid: index + 1,
     departmentname: name
   }));
 
+const createSeedDatabase = () => ({
+  departments: createSeedDepartments(),
+  authAccounts: [
+    { email: 'admin@caresphere.pk', password: 'Admin123!' },
+    { email: 'dr.sana@caresphere.pk', password: 'Doctor123!' },
+    { email: 'dr.owais@caresphere.pk', password: 'Doctor123!' },
+    { email: 'dr.mariam@caresphere.pk', password: 'Doctor123!' },
+    { email: 'dr.hamza@caresphere.pk', password: 'Doctor123!' },
+    { email: 'dr.ayesha@caresphere.pk', password: 'Doctor123!' },
+    { email: 'nurse.zara@caresphere.pk', password: 'Nurse123!' },
+    { email: 'nurse.hina@caresphere.pk', password: 'Nurse123!' },
+    { email: 'reception@caresphere.pk', password: 'Reception123!' },
+    { email: 'ward@caresphere.pk', password: 'Ward123!' },
+    { email: 'patient@caresphere.pk', password: 'Patient123!' }
+  ],
+  admins: [
+    {
+      adminid: 1,
+      username: 'admin@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      role: ROLES.ADMIN
+    }
+  ],
+  doctor: [
+    {
+      docid: 1,
+      name: 'Dr. Sana Ahmed',
+      depid: 1,
+      gender: 'Female',
+      email: 'dr.sana@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03001234567',
+      address: 'DHA Phase 6, Lahore',
+      qualification: 'MBBS, FCPS',
+      specialization: 'Emergency Medicine',
+      experience: 8,
+      salary: 250000,
+      status: 'Active',
+      shift_start: '08:00',
+      shift_end: '16:00'
+    },
+    {
+      docid: 2,
+      name: 'Dr. Owais Khan',
+      depid: 2,
+      gender: 'Male',
+      email: 'dr.owais@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03001112222',
+      address: 'Johar Town, Lahore',
+      qualification: 'MBBS, MS',
+      specialization: 'General Surgery',
+      experience: 10,
+      salary: 275000,
+      status: 'Active',
+      shift_start: '09:00',
+      shift_end: '17:00'
+    },
+    {
+      docid: 3,
+      name: 'Dr. Mariam Ali',
+      depid: 3,
+      gender: 'Female',
+      email: 'dr.mariam@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03002223333',
+      address: 'Model Town, Lahore',
+      qualification: 'MBBS, FCPS',
+      specialization: 'Pediatrics',
+      experience: 7,
+      salary: 230000,
+      status: 'Active',
+      shift_start: '10:00',
+      shift_end: '18:00'
+    },
+    {
+      docid: 4,
+      name: 'Dr. Hamza Raza',
+      depid: 4,
+      gender: 'Male',
+      email: 'dr.hamza@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03003334444',
+      address: 'Gulberg, Lahore',
+      qualification: 'MBBS, FCPS',
+      specialization: 'Orthopedics',
+      experience: 9,
+      salary: 245000,
+      status: 'Active',
+      shift_start: '08:30',
+      shift_end: '16:30'
+    },
+    {
+      docid: 5,
+      name: 'Dr. Ayesha Noor',
+      depid: 5,
+      gender: 'Female',
+      email: 'dr.ayesha@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03004445555',
+      address: 'Cantt, Lahore',
+      qualification: 'MBBS, FRCR',
+      specialization: 'Radiology',
+      experience: 11,
+      salary: 290000,
+      status: 'Active',
+      shift_start: '11:00',
+      shift_end: '19:00'
+    }
+  ],
+  nurse: [
+    {
+      nurseid: 1,
+      nursename: 'Zara Iqbal',
+      depid: 1,
+      gender: 'Female',
+      phoneno: '03005556666',
+      email: 'nurse.zara@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      address: 'Askari 11, Lahore',
+      salary: 95000,
+      shift: 'Morning',
+      status: 'Active',
+      shift_start: '07:00',
+      shift_end: '15:00'
+    },
+    {
+      nurseid: 2,
+      nursename: 'Hina Saeed',
+      depid: 3,
+      gender: 'Female',
+      phoneno: '03006667777',
+      email: 'nurse.hina@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      address: 'Wapda Town, Lahore',
+      salary: 90000,
+      shift: 'Evening',
+      status: 'Active',
+      shift_start: '13:00',
+      shift_end: '21:00'
+    }
+  ],
+  receptionist: [
+    {
+      repid: 1,
+      name: 'Imran Desk',
+      depid: 1,
+      gender: 'Male',
+      email: 'reception@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      phoneno: '03007778888',
+      address: 'Bahria Town, Lahore',
+      shift: 'Front Desk',
+      status: 'Active',
+      shift_start: '08:00',
+      shift_end: '16:00'
+    }
+  ],
+  wardboy: [
+    {
+      wardbid: 1,
+      wardbname: 'Naveed Staff',
+      depid: 2,
+      gender: 'Male',
+      email: 'ward@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      address: 'Township, Lahore',
+      phoneno: '03008889999',
+      salary: 60000,
+      shift: 'General',
+      status: 'Active',
+      shift_start: '09:00',
+      shift_end: '17:00'
+    }
+  ],
+  patient: [
+    {
+      pid: 1,
+      pname: 'Ali Raza',
+      gender: 'Male',
+      dob: '1998-06-15',
+      phoneno: '03009990000',
+      email: 'patient@caresphere.pk',
+      passwordhash: LOCAL_AUTH_SENTINEL,
+      address: 'DHA Phase 5, Lahore',
+      bloodgroup: 'B+',
+      emergencyphoneno: '03112223344',
+      registrationdate: new Date().toISOString(),
+      disease: 'Seasonal Flu',
+      status: 'Active'
+    }
+  ],
+  appointment: [
+    {
+      apid: 1,
+      appointmentdate: createFutureDate(1, 10, 0),
+      pid: 1,
+      docid: 1,
+      depid: 1,
+      disease: 'Fever',
+      note: 'First consultation',
+      status: 'Pending'
+    },
+    {
+      apid: 2,
+      appointmentdate: createFutureDate(2, 14, 30),
+      pid: 1,
+      docid: 3,
+      depid: 3,
+      disease: 'Pediatric follow-up',
+      note: 'Bring previous reports',
+      status: 'Confirmed'
+    }
+  ],
+  ward: [
+    { wardid: 1, wardno: 'E-101', totalbeds: 20, availablebeds: 14, depid: 1, status: 'Active' },
+    { wardid: 2, wardno: 'S-201', totalbeds: 18, availablebeds: 9, depid: 2, status: 'Active' },
+    { wardid: 3, wardno: 'P-301', totalbeds: 22, availablebeds: 12, depid: 3, status: 'Active' },
+    { wardid: 4, wardno: 'O-401', totalbeds: 16, availablebeds: 6, depid: 4, status: 'Active' },
+    { wardid: 5, wardno: 'R-501', totalbeds: 12, availablebeds: 8, depid: 5, status: 'Active' }
+  ],
+  applications: [],
+  wardboytasks: [
+    {
+      taskid: 1,
+      wardbid: 1,
+      assignedbyrole: ROLES.ADMIN,
+      assignedbyname: 'Admin',
+      taskdescription: 'Prepare operation support trolley for Surgical ward.',
+      status: 'Pending',
+      createdat: new Date().toISOString()
+    }
+  ],
+  meta: {
+    version: 2,
+    provider: 'local-storage'
+  }
+});
+
+const normalizeDatabaseShape = (database) => {
+  const seeded = createSeedDatabase();
   return {
-    authAccounts: [
-      { email: 'admin@caresphere.pk', password: 'Admin123!' },
-      { email: 'dr.sana@caresphere.pk', password: 'Doctor123!' },
-      { email: 'dr.owais@caresphere.pk', password: 'Doctor123!' },
-      { email: 'dr.mariam@caresphere.pk', password: 'Doctor123!' },
-      { email: 'dr.hamza@caresphere.pk', password: 'Doctor123!' },
-      { email: 'dr.ayesha@caresphere.pk', password: 'Doctor123!' },
-      { email: 'nurse.zara@caresphere.pk', password: 'Nurse123!' },
-      { email: 'nurse.hina@caresphere.pk', password: 'Nurse123!' },
-      { email: 'reception@caresphere.pk', password: 'Reception123!' },
-      { email: 'ward@caresphere.pk', password: 'Ward123!' },
-      { email: 'patient@caresphere.pk', password: 'Patient123!' }
-    ],
-    admins: [
-      {
-        adminid: 1,
-        username: 'admin@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        role: ROLES.ADMIN
-      }
-    ],
-    doctor: [
-      {
-        docid: 1,
-        name: 'Dr. Sana Ahmed',
-        depid: 1,
-        gender: 'Female',
-        email: 'dr.sana@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03001234567',
-        address: 'DHA Phase 6, Lahore',
-        qualification: 'MBBS, FCPS',
-        specialization: 'Emergency Medicine',
-        experience: 8,
-        salary: 250000,
-        status: 'Active',
-        shift_start: '08:00',
-        shift_end: '16:00'
-      },
-      {
-        docid: 2,
-        name: 'Dr. Owais Khan',
-        depid: 2,
-        gender: 'Male',
-        email: 'dr.owais@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03001112222',
-        address: 'Johar Town, Lahore',
-        qualification: 'MBBS, MS',
-        specialization: 'General Surgery',
-        experience: 10,
-        salary: 275000,
-        status: 'Active',
-        shift_start: '09:00',
-        shift_end: '17:00'
-      },
-      {
-        docid: 3,
-        name: 'Dr. Mariam Ali',
-        depid: 3,
-        gender: 'Female',
-        email: 'dr.mariam@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03002223333',
-        address: 'Model Town, Lahore',
-        qualification: 'MBBS, FCPS',
-        specialization: 'Pediatrics',
-        experience: 7,
-        salary: 230000,
-        status: 'Active',
-        shift_start: '10:00',
-        shift_end: '18:00'
-      },
-      {
-        docid: 4,
-        name: 'Dr. Hamza Raza',
-        depid: 4,
-        gender: 'Male',
-        email: 'dr.hamza@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03003334444',
-        address: 'Gulberg, Lahore',
-        qualification: 'MBBS, FCPS',
-        specialization: 'Orthopedics',
-        experience: 9,
-        salary: 245000,
-        status: 'Active',
-        shift_start: '08:30',
-        shift_end: '16:30'
-      },
-      {
-        docid: 5,
-        name: 'Dr. Ayesha Noor',
-        depid: 5,
-        gender: 'Female',
-        email: 'dr.ayesha@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03004445555',
-        address: 'Cantt, Lahore',
-        qualification: 'MBBS, FRCR',
-        specialization: 'Radiology',
-        experience: 11,
-        salary: 290000,
-        status: 'Active',
-        shift_start: '11:00',
-        shift_end: '19:00'
-      }
-    ],
-    nurse: [
-      {
-        nurseid: 1,
-        nursename: 'Zara Iqbal',
-        depid: 1,
-        gender: 'Female',
-        phoneno: '03005556666',
-        email: 'nurse.zara@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        address: 'Askari 11, Lahore',
-        salary: 95000,
-        shift: 'Morning',
-        status: 'Active',
-        shift_start: '07:00',
-        shift_end: '15:00'
-      },
-      {
-        nurseid: 2,
-        nursename: 'Hina Saeed',
-        depid: 3,
-        gender: 'Female',
-        phoneno: '03006667777',
-        email: 'nurse.hina@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        address: 'Wapda Town, Lahore',
-        salary: 90000,
-        shift: 'Evening',
-        status: 'Active',
-        shift_start: '13:00',
-        shift_end: '21:00'
-      }
-    ],
-    receptionist: [
-      {
-        repid: 1,
-        name: 'Imran Desk',
-        depid: 1,
-        gender: 'Male',
-        email: 'reception@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        phoneno: '03007778888',
-        address: 'Bahria Town, Lahore',
-        shift: 'Front Desk',
-        status: 'Active',
-        shift_start: '08:00',
-        shift_end: '16:00'
-      }
-    ],
-    wardboy: [
-      {
-        wardbid: 1,
-        wardbname: 'Naveed Staff',
-        depid: 2,
-        gender: 'Male',
-        email: 'ward@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        address: 'Township, Lahore',
-        phoneno: '03008889999',
-        salary: 60000,
-        shift: 'General',
-        status: 'Active',
-        shift_start: '09:00',
-        shift_end: '17:00'
-      }
-    ],
-    patient: [
-      {
-        pid: 1,
-        pname: 'Ali Raza',
-        gender: 'Male',
-        dob: '1998-06-15',
-        phoneno: '03009990000',
-        email: 'patient@caresphere.pk',
-        passwordhash: LOCAL_AUTH_SENTINEL,
-        address: 'DHA Phase 5, Lahore',
-        bloodgroup: 'B+',
-        emergencyphoneno: '03112223344',
-        registrationdate: new Date().toISOString(),
-        disease: 'Seasonal Flu',
-        status: 'Active'
-      }
-    ],
-    appointment: [
-      {
-        apid: 1,
-        appointmentdate: createFutureDate(1, 10, 0),
-        pid: 1,
-        docid: 1,
-        depid: 1,
-        disease: 'Fever',
-        note: 'First consultation',
-        status: 'Pending'
-      },
-      {
-        apid: 2,
-        appointmentdate: createFutureDate(2, 14, 30),
-        pid: 1,
-        docid: 3,
-        depid: 3,
-        disease: 'Pediatric follow-up',
-        note: 'Bring previous reports',
-        status: 'Confirmed'
-      }
-    ],
-    ward: [
-      { wardid: 1, wardno: 'E-101', totalbeds: 20, availablebeds: 14, depid: 1, status: 'Active' },
-      { wardid: 2, wardno: 'S-201', totalbeds: 18, availablebeds: 9, depid: 2, status: 'Active' },
-      { wardid: 3, wardno: 'P-301', totalbeds: 22, availablebeds: 12, depid: 3, status: 'Active' },
-      { wardid: 4, wardno: 'O-401', totalbeds: 16, availablebeds: 6, depid: 4, status: 'Active' },
-      { wardid: 5, wardno: 'R-501', totalbeds: 12, availablebeds: 8, depid: 5, status: 'Active' }
-    ],
-    applications: [],
-    wardboytasks: [
-      {
-        taskid: 1,
-        wardbid: 1,
-        assignedbyrole: ROLES.ADMIN,
-        assignedbyname: 'Admin',
-        taskdescription: 'Prepare operation support trolley for Surgical ward.',
-        status: 'Pending',
-        createdat: new Date().toISOString()
-      }
-    ],
+    ...seeded,
+    ...database,
+    departments: Array.isArray(database?.departments) ? database.departments : seeded.departments,
+    authAccounts: Array.isArray(database?.authAccounts) ? database.authAccounts : seeded.authAccounts,
+    admins: Array.isArray(database?.admins) ? database.admins : seeded.admins,
+    doctor: Array.isArray(database?.doctor) ? database.doctor : seeded.doctor,
+    nurse: Array.isArray(database?.nurse) ? database.nurse : seeded.nurse,
+    receptionist: Array.isArray(database?.receptionist)
+      ? database.receptionist
+      : seeded.receptionist,
+    wardboy: Array.isArray(database?.wardboy) ? database.wardboy : seeded.wardboy,
+    patient: Array.isArray(database?.patient) ? database.patient : seeded.patient,
+    appointment: Array.isArray(database?.appointment) ? database.appointment : seeded.appointment,
+    ward: Array.isArray(database?.ward) ? database.ward : seeded.ward,
+    applications: Array.isArray(database?.applications) ? database.applications : seeded.applications,
+    wardboytasks: Array.isArray(database?.wardboytasks) ? database.wardboytasks : seeded.wardboytasks,
     meta: {
-      version: 1,
+      ...seeded.meta,
+      ...(database?.meta || {}),
       provider: 'local-storage'
     }
   };
@@ -344,12 +371,18 @@ const ensureDatabase = () => {
     return seededDatabase;
   }
 
-  return database;
+  const normalizedDatabase = normalizeDatabaseShape(database);
+  if (JSON.stringify(database) !== JSON.stringify(normalizedDatabase)) {
+    writeJson(DB_KEY, normalizedDatabase);
+  }
+
+  return normalizedDatabase;
 };
 
 const saveDatabase = (database) => {
-  writeJson(DB_KEY, database);
-  return database;
+  const normalizedDatabase = normalizeDatabaseShape(database);
+  writeJson(DB_KEY, normalizedDatabase);
+  return normalizedDatabase;
 };
 
 const getSessionEmail = () => {
@@ -378,7 +411,9 @@ const getResetTokens = () => {
 const saveResetTokens = (tokens) => writeJson(RESET_KEY, tokens);
 
 const findAuthAccount = (database, email) =>
-  (database.authAccounts || []).find((account) => normalizeEmail(account.email) === normalizeEmail(email));
+  (database.authAccounts || []).find(
+    (account) => normalizeEmail(account.email) === normalizeEmail(email)
+  );
 
 const findProfileEntryByEmail = (database, email) => {
   const safeEmail = normalizeEmail(email);
@@ -420,7 +455,7 @@ const getDisplayName = (table, record) => {
   return 'Unknown';
 };
 
-const buildProfile = (table, record) => {
+const buildProfile = (table, record, departmentName = null) => {
   const emailField = EMAIL_FIELDS[table];
   const idField = ID_FIELDS[table];
 
@@ -429,6 +464,8 @@ const buildProfile = (table, record) => {
     name: getDisplayName(table, record),
     email: normalizeEmail(record[emailField] || ''),
     role: TABLE_TO_ROLE[table],
+    department: departmentName,
+    depid: record.depid || null,
     profile: deepClone(record)
   };
 };
@@ -451,7 +488,8 @@ const buildUsers = (database) => {
       id: user.adminid,
       name: getDisplayName('admins', user),
       email: user.username || 'unknown',
-      role: ROLES.ADMIN
+      role: ROLES.ADMIN,
+      profile: deepClone(user)
     })),
     ...(database.doctor || []).map((user) => ({
       ...user,
@@ -459,10 +497,11 @@ const buildUsers = (database) => {
       name: user.name || 'Unknown',
       email: user.email || 'unknown',
       role: ROLES.DOCTOR,
-      department: deptMap[user.depid],
+      department: deptMap[user.depid] || null,
       depid: user.depid,
       shift_start: user.shift_start || '09:00',
-      shift_end: user.shift_end || '17:00'
+      shift_end: user.shift_end || '17:00',
+      profile: deepClone(user)
     })),
     ...(database.nurse || []).map((user) => ({
       ...user,
@@ -470,10 +509,11 @@ const buildUsers = (database) => {
       name: user.nursename || 'Unknown',
       email: user.email || 'unknown',
       role: ROLES.NURSE,
-      department: deptMap[user.depid],
+      department: deptMap[user.depid] || null,
       depid: user.depid,
       shift_start: user.shift_start || '09:00',
-      shift_end: user.shift_end || '17:00'
+      shift_end: user.shift_end || '17:00',
+      profile: deepClone(user)
     })),
     ...(database.receptionist || []).map((user) => ({
       ...user,
@@ -481,10 +521,11 @@ const buildUsers = (database) => {
       name: user.name || 'Unknown',
       email: user.email || 'unknown',
       role: ROLES.RECEPTIONIST,
-      department: deptMap[user.depid],
+      department: deptMap[user.depid] || null,
       depid: user.depid,
       shift_start: user.shift_start || '09:00',
-      shift_end: user.shift_end || '17:00'
+      shift_end: user.shift_end || '17:00',
+      profile: deepClone(user)
     })),
     ...(database.wardboy || []).map((user) => ({
       ...user,
@@ -492,17 +533,19 @@ const buildUsers = (database) => {
       name: user.wardbname || 'Unknown',
       email: user.email || 'unknown',
       role: ROLES.WARDBOY,
-      department: deptMap[user.depid],
+      department: deptMap[user.depid] || null,
       depid: user.depid,
       shift_start: user.shift_start || '09:00',
-      shift_end: user.shift_end || '17:00'
+      shift_end: user.shift_end || '17:00',
+      profile: deepClone(user)
     })),
     ...(database.patient || []).map((user) => ({
       ...user,
       id: user.pid,
       name: user.pname || 'Unknown',
       email: user.email || 'unknown',
-      role: ROLES.PATIENT
+      role: ROLES.PATIENT,
+      profile: deepClone(user)
     }))
   ];
 };
@@ -514,18 +557,20 @@ const buildAppointments = (database) => {
     (database.departments || []).map((department) => [department.depid, department.departmentname])
   );
 
-  return (database.appointment || []).map((appointment) => ({
-    id: appointment.apid,
-    patientName: patientMap.get(appointment.pid)?.pname,
-    doctorName: doctorMap.get(appointment.docid)?.name,
-    doctorId: appointment.docid,
-    department: deptMap.get(appointment.depid),
-    date: appointment.appointmentdate,
-    status: appointment.status,
-    patientId: appointment.pid,
-    disease: appointment.disease,
-    note: appointment.note
-  }));
+  return (database.appointment || [])
+    .map((appointment) => ({
+      id: appointment.apid,
+      patientName: patientMap.get(appointment.pid)?.pname,
+      doctorName: doctorMap.get(appointment.docid)?.name,
+      doctorId: appointment.docid,
+      department: deptMap.get(appointment.depid) || null,
+      date: appointment.appointmentdate,
+      status: appointment.status,
+      patientId: appointment.pid,
+      disease: appointment.disease,
+      note: appointment.note
+    }))
+    .sort((left, right) => new Date(left.date) - new Date(right.date));
 };
 
 const buildWards = (database) => {
@@ -536,8 +581,9 @@ const buildWards = (database) => {
   return (database.ward || []).map((ward) => ({
     id: ward.wardid,
     wardNo: ward.wardno,
-    department: deptMap.get(ward.depid),
+    department: deptMap.get(ward.depid) || null,
     departmentId: ward.depid,
+    depid: ward.depid,
     totalBeds: ward.totalbeds,
     availableBeds: ward.availablebeds
   }));
@@ -691,9 +737,15 @@ const getUserState = () => {
   const database = ensureDatabase();
   const sessionEmail = getSessionEmail();
   const sessionProfile = sessionEmail ? findProfileEntryByEmail(database, sessionEmail) : null;
+  const departmentName =
+    sessionProfile?.record?.depid != null
+      ? (database.departments || []).find(
+          (department) => department.depid === sessionProfile.record.depid
+        )?.departmentname || null
+      : null;
 
   return {
-    user: sessionProfile ? buildProfile(sessionProfile.table, sessionProfile.record) : null,
+    user: sessionProfile ? buildProfile(sessionProfile.table, sessionProfile.record, departmentName) : null,
     users: buildUsers(database),
     appointments: buildAppointments(database),
     applications: deepClone(database.applications || []),
@@ -718,7 +770,11 @@ const login = (email, password) => {
 
   const profileEntry = findProfileEntryByEmail(database, safeEmail);
   if (!profileEntry) {
-    return { success: false, code: 'NO_PROFILE', message: 'This account has no profile in the local system yet.' };
+    return {
+      success: false,
+      code: 'NO_PROFILE',
+      message: 'This account has no profile in the local system yet.'
+    };
   }
 
   setSessionEmail(safeEmail);

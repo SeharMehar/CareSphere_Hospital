@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { backend } from '../backend';
 import Navbar from '../components/Navbar';
@@ -6,11 +6,13 @@ import Footer from '../components/Footer';
 import './SharedPages.css';
 
 const getResetTokenFromLocation = (search, hash) => {
-  const searchToken = new URLSearchParams(search).get('token');
+  const searchParams = new URLSearchParams(search);
+  const searchToken = searchParams.get('token') || searchParams.get('access_token');
   if (searchToken) return searchToken;
 
-  const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
-  return new URLSearchParams(hashQuery).get('token') || '';
+  const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?')) : hash.slice(1);
+  const hashParams = new URLSearchParams(hashQuery);
+  return hashParams.get('token') || hashParams.get('access_token') || '';
 };
 
 const ResetPassword = () => {
@@ -20,9 +22,9 @@ const ResetPassword = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const resetToken = useMemo(
-    () => getResetTokenFromLocation(location.search, typeof window === 'undefined' ? '' : window.location.hash),
-    [location.search]
+  const resetToken = getResetTokenFromLocation(
+    location.search,
+    typeof window === 'undefined' ? '' : window.location.hash
   );
 
   useEffect(() => {

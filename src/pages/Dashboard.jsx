@@ -4,6 +4,58 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ROLES } from '../dummyData';
 import './SharedPages.css';
 
+const getDeterministicIndex = (seed, length) => {
+  if (length <= 0) return 0;
+
+  let hash = 0;
+  for (const char of seed) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+  }
+
+  return Math.abs(hash) % length;
+};
+
+const formatRoleLabel = (role = '') =>
+  role
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+const formatDateTime = (value) => {
+  if (!value) return 'Not available';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString([], {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+};
+
+const formatDateOnly = (value) => {
+  if (!value) return 'Not available';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString([], {
+    dateStyle: 'medium'
+  });
+};
+
+const formatStatusLabel = (status = '') =>
+  status
+    .split(/[_\s-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -46,27 +98,188 @@ const Dashboard = () => {
 };
 
 const ProfileDetails = () => {
-    const { user } = useAuth();
-    if (!user || !user.profile) return null;
+  const { user } = useAuth();
+  if (!user) return null;
+  const isPatientRole = user?.role === ROLES.PATIENT;
 
-    const omitKeys = ['adminid', 'docid', 'nurseid', 'repid', 'pid', 'wardbid', 'depid', 'status', 'registrationdate'];
-    const entries = Object.entries(user.profile).filter(([k]) => !omitKeys.includes(k));
+  const readValue = (...keys) => {
+    for (const key of keys) {
+      const directValue = user?.[key];
+      if (directValue !== undefined && directValue !== null && directValue !== '') {
+        return directValue;
+      }
 
-    return (
-        <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '30px' }}>
-            <h4 style={{ margin: '0 0 15px', color: '#112A46', fontSize: '1.4rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px' }}>My Profile & Credentials</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
-                {entries.map(([key, val]) => (
-                    <div key={key}>
-                        <strong style={{ display: 'block', color: '#64748b', textTransform: 'capitalize', fontSize: '0.85rem', marginBottom: '4px' }}>
-                            {key === 'passwordhash' ? 'Password' : key}
-                        </strong>
-                        <span style={{ color: '#0f172a', wordBreak: 'break-all' }}>{val || 'N/A'}</span>
-                    </div>
-                ))}
+      const profileValue = user?.profile?.[key];
+      if (profileValue !== undefined && profileValue !== null && profileValue !== '') {
+        return profileValue;
+      }
+    }
+
+    return null;
+  };
+
+  const formatFieldValue = (field, value) => {
+    if (value === null || value === undefined || value === '') {
+      return 'Not provided';
+    }
+
+    if (['confirmed_at', 'last_login'].includes(field)) {
+      return formatDateTime(value);
+    }
+
+    if (field === 'created_at') {
+      return formatDateOnly(value);
+    }
+
+    if (field === 'salary') {
+      const amount = Number(value);
+      if (Number.isFinite(amount)) {
+        return new Intl.NumberFormat(undefined, {
+          style: 'currency',
+          currency: 'PKR',
+          maximumFractionDigits: 0
+        }).format(amount);
+      }
+    }
+
+    if (field === 'experience') {
+      return `${value} year${Number(value) === 1 ? '' : 's'}`;
+    }
+
+    if (field === 'auth_status') {
+      return formatStatusLabel(String(value));
+    }
+
+    return value;
+  };
+
+  const profileSections = [
+    {
+      title: 'Personal Information',
+      fields: [
+        { key: 'gender', label: 'Gender' },
+        { key: 'bloodgroup', label: 'Blood Group' },
+        { key: 'disease', label: 'Condition / Notes' }
+      ]
+    },
+    {
+      title: 'Contact Details',
+      fields: [
+        { key: 'phone', label: 'Phone Number' },
+        { key: 'emergencyphoneno', label: 'Emergency Contact' },
+        { key: 'address', label: 'Address' }
+      ]
+    },
+    {
+      title: 'Professional Details',
+      fields: [
+        { key: 'department', label: 'Department' },
+        { key: 'qualification', label: 'Qualification' },
+        { key: 'specialization', label: 'Specialization' },
+        { key: 'experience', label: 'Experience' },
+        { key: 'salary', label: 'Salary' },
+        { key: 'shift_start', label: 'Shift Start' },
+        { key: 'shift_end', label: 'Shift End' }
+      ]
+    },
+    {
+      title: 'Account Status',
+      fields: [
+        { key: 'auth_status', label: 'Access Status' },
+        { key: 'confirmed_at', label: 'Email Confirmed' },
+        { key: 'last_login', label: 'Last Login' },
+        { key: 'created_at', label: 'Member Since' }
+      ]
+    }
+  ];
+
+  const visibleSections = profileSections
+    .filter((section) => !(isPatientRole && section.title === 'Professional Details'))
+    .map((section) => ({
+      ...section,
+      fields: section.fields.filter((field) => {
+        const value = readValue(field.key);
+        return value !== null || section.title === 'Account Status';
+      })
+    }))
+    .filter((section) => section.fields.length > 0);
+
+  const quickStats = [
+    {
+      label: 'Role',
+      value: formatRoleLabel(readValue('role') || 'user')
+    },
+    {
+      label: 'Access',
+      value: formatFieldValue('auth_status', readValue('auth_status'))
+    },
+    {
+      label: 'Member Since',
+      value: formatFieldValue('created_at', readValue('created_at'))
+    }
+  ];
+
+  if (!isPatientRole) {
+    quickStats.splice(1, 0, {
+      label: 'Department',
+      value: readValue('department') || 'Unassigned'
+    });
+  }
+
+  return (
+    <section className="profile-card">
+      <div className="profile-hero">
+        <div className="profile-identity">
+          <div className="profile-avatar">
+            {(readValue('name') || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <p className="profile-kicker">My Profile</p>
+            <h3 className="profile-name">{readValue('name') || 'CareSphere User'}</h3>
+            <div className="profile-meta">
+              <span className="profile-badge">{formatRoleLabel(readValue('role') || 'user')}</span>
+              <span>{readValue('email') || 'No email available'}</span>
             </div>
+          </div>
         </div>
-    );
+
+        <div className="profile-reference">
+          <span className="profile-reference-label">Account Reference</span>
+          <strong>#{readValue('id') || 'N/A'}</strong>
+          <span className="profile-reference-note">
+            Auth link {readValue('auth_user_id') ? 'connected' : 'pending'}
+          </span>
+        </div>
+      </div>
+
+      <div className="profile-stat-grid">
+        {quickStats.map((stat) => (
+          <div key={stat.label} className="profile-stat-card">
+            <span className="profile-stat-label">{stat.label}</span>
+            <strong className="profile-stat-value">{stat.value}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="profile-section-grid">
+        {visibleSections.map((section) => (
+          <div key={section.title} className="profile-section">
+            <h4>{section.title}</h4>
+            <div className="profile-field-list">
+              {section.fields.map((field) => (
+                <div key={field.key} className="profile-field-item">
+                  <span className="profile-field-label">{field.label}</span>
+                  <span className="profile-field-value">
+                    {formatFieldValue(field.key, readValue(field.key))}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 };
 
 /* Role Specific Views */
@@ -547,7 +760,10 @@ const PatientView = () => {
         alert(`No doctors in ${department} are currently available at ${timeString}. Please choose a different time.`);
         return;
       }
-      const randomIndex = Math.floor(Math.random() * availableDocs.length);
+      const randomIndex = getDeterministicIndex(
+        `${date}-${department}-${user.id}`,
+        availableDocs.length
+      );
       selectedDocId = availableDocs[randomIndex].id;
     } else if (selectedDocId !== 'random') {
       const selectedDoctor = doctorsInDept.find(d => d.id.toString() === selectedDocId.toString());

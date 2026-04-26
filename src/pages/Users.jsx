@@ -7,6 +7,8 @@ import './SharedPages.css';
 
 const Users = () => {
   const { users, user, departments, addUser, removeUser, updateUserRole, updateUserDetails } = useAuth();
+  const primaryAdminEmail = (import.meta.env.VITE_PRIMARY_ADMIN_EMAIL || '').trim().toLowerCase();
+  const primaryAdminName = (import.meta.env.VITE_PRIMARY_ADMIN_NAME || 'Primary Admin').trim() || 'Primary Admin';
   
   const [formData, setFormData] = useState({ name: '', username: '', password: '', role: ROLES.PATIENT });
   const [selectedUser, setSelectedUser] = useState(null);
@@ -25,6 +27,7 @@ const Users = () => {
 
   // Safe users list - filter out any null/undefined entries
   const safeUsers = Array.isArray(users) ? users.filter(u => u != null && typeof u === 'object') : [];
+  const activeAdmin = safeUsers.find(u => u.role === ROLES.ADMIN && u.status !== 'Removed');
 
   const filteredUsers = safeUsers.filter(u => {
     const matchesRole = filterRole === 'All' || u.role === filterRole;
@@ -36,6 +39,7 @@ const Users = () => {
   });
 
   const availableRoles = Object.values(ROLES).filter(role => {
+    if (role === ROLES.ADMIN) return user.role === ROLES.ADMIN && !activeAdmin;
     if (user.role === ROLES.ADMIN) return true;
     if (user.role === ROLES.DOCTOR) return role !== ROLES.ADMIN;
     return false;
@@ -88,7 +92,11 @@ const Users = () => {
 
     // First, handle role change if changed (Admins only)
     if (editDetails.role !== selectedUser.role && user.role === ROLES.ADMIN) {
-      await updateUserRole(selectedUser.id, selectedUser.role, editDetails.role);
+      const roleResult = await updateUserRole(selectedUser.id, selectedUser.role, editDetails.role);
+      if (!roleResult.success) {
+        alert('Failed to update role: ' + roleResult.message);
+        return;
+      }
     }
 
     // Now construct payload based on role
@@ -139,10 +147,14 @@ const Users = () => {
     closeUserModal();
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (!selectedUser) return;
     if (window.confirm(`Are you sure you want to remove ${selectedUser.name || 'this user'}?`)) {
-      removeUser(selectedUser);
+      const result = await removeUser(selectedUser);
+      if (!result.success) {
+        alert('Failed to remove user: ' + result.message);
+        return;
+      }
       closeUserModal();
     }
   };
@@ -184,6 +196,12 @@ const Users = () => {
                   </select>
                 </div>
                 <button type="submit" className="submit-btn" style={{padding: '12px'}}>Add User</button>
+                <p style={{marginTop: '12px', fontSize: '0.88rem', color: '#64748b', lineHeight: 1.5}}>
+                  New staff accounts receive a confirmation email from Supabase. Ask the user to check inbox or spam and confirm before first login.
+                </p>
+                <p style={{marginTop: '10px', fontSize: '0.88rem', color: '#475569', lineHeight: 1.5}}>
+                  Primary admin is locked to {primaryAdminName}{primaryAdminEmail ? ` (${primaryAdminEmail})` : ''}. Create all other staff accounts here.
+                </p>
               </form>
             </div>
           </div>
@@ -225,6 +243,12 @@ const Users = () => {
                     <div style={{fontSize: '0.9rem', color: '#666'}}>
                       <p style={{margin: '2px 0'}}><strong>Email:</strong> {u.email || u.username || 'N/A'}</p>
                       {u.department && <p style={{margin: '2px 0'}}><strong>Dept:</strong> {u.department}</p>}
+                      <p style={{margin: '2px 0'}}>
+                        <strong>Access:</strong> {u.authStatus === 'pending_confirmation' ? 'Pending Confirmation' : u.authStatus === 'disabled' ? 'Disabled' : 'Active'}
+                      </p>
+                      {u.role === ROLES.ADMIN && (
+                        <p style={{margin: '2px 0'}}><strong>Scope:</strong> Primary System Admin</p>
+                      )}
                       {u.role === ROLES.PATIENT && u.disease && <p style={{margin: '2px 0'}}><strong>Condition:</strong> {u.disease}</p>}
                     </div>
                     <div style={{marginTop: 'auto', paddingTop: '10px', textAlign: 'right'}}>
@@ -245,6 +269,9 @@ const Users = () => {
             <button className="modal-close" onClick={closeUserModal}>&times;</button>
             <h3 style={{color: '#112A46', marginBottom: '5px'}}>Edit {selectedUser.name || 'User'}</h3>
             <p style={{color: '#888', fontSize: '0.9rem', marginBottom: '20px'}}>Update details or permissions for this user.</p>
+            <p style={{color: '#475569', fontSize: '0.9rem', marginBottom: '20px'}}>
+              Access status: <strong>{selectedUser.authStatus === 'pending_confirmation' ? 'Pending Confirmation' : selectedUser.authStatus === 'disabled' ? 'Disabled' : 'Active'}</strong>
+            </p>
             
             <form onSubmit={handleSaveDetails} style={{boxShadow: 'none', padding: 0, maxWidth: '100%'}}>
               
@@ -339,7 +366,7 @@ const Users = () => {
                 <div className="form-group">
                   <label>System Role</label>
                   <select value={editDetails.role} onChange={e => handleDetailChange('role', e.target.value)}>
-                    {Object.values(ROLES).map(role => (
+                    {Object.values(ROLES).filter(role => role !== ROLES.ADMIN).map(role => (
                       <option key={role} value={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</option>
                     ))}
                   </select>
@@ -349,7 +376,7 @@ const Users = () => {
               <hr style={{border: 'none', borderTop: '1px solid #eee', margin: '20px 0'}} />
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                {user.role === ROLES.ADMIN && selectedUser.id && user.id && selectedUser.id !== user.id ? (
+                {user.role === ROLES.ADMIN && selectedUser.id && user.id && selectedUser.id !== user.id && selectedUser.role !== ROLES.ADMIN ? (
                    <button type="button" onClick={handleDeleteUser} className="action-btn danger">Remove User</button>
                 ) : <div></div>}
                 <div style={{display: 'flex', gap: '10px'}}>

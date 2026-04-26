@@ -14,6 +14,7 @@ import Doctors from './pages/Doctors';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import NotFound from './pages/NotFound';
+import { ROLES } from './dummyData';
 
 function App() {
   const useHashRouter =
@@ -45,7 +46,7 @@ function App() {
           <Route 
             path="/users" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.DOCTOR]}>
                 <Users />
               </ProtectedRoute>
             } 
@@ -53,7 +54,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/appointment" element={<Appointment />} />
+          <Route
+            path="/appointment"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <Appointment />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/apply" element={<Apply />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />

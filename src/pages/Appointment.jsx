@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './SharedPages.css';
-import { DEPARTMENTS } from '../dummyData';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
+const getDeterministicIndex = (seed, length) => {
+    if (length <= 0) return 0;
+
+    let hash = 0;
+    for (const char of seed) {
+        hash = (hash * 31 + char.charCodeAt(0)) % 2147483647;
+    }
+
+    return Math.abs(hash) % length;
+};
 
 const Appointment = () => {
     const { user, users, departments, bookAppointment } = useAuth();
     const navigate = useNavigate();
-    
-    // Redirect if not logged in
-    useEffect(() => {
-        if (!user) {
-            alert('You must be registered as a Patient to book an appointment.');
-            navigate('/signup');
-        }
-    }, [user, navigate]);
 
     const [formData, setFormData] = useState({
         patientName: user?.name || '',
@@ -49,7 +51,10 @@ const Appointment = () => {
                 alert(`No doctors in ${formData.department} are currently available at ${timeString}. Please choose a different time.`);
                 return;
             }
-            const randomIndex = Math.floor(Math.random() * availableDocs.length);
+            const randomIndex = getDeterministicIndex(
+                `${formData.date}-${formData.department}-${formData.patientName}`,
+                availableDocs.length
+            );
             finalDocId = availableDocs[randomIndex].id;
             finalDocName = availableDocs[randomIndex].name;
         } else if (finalDocId !== 'random') {

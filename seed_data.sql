@@ -1,112 +1,120 @@
--- CareSphere Data Seed
+-- CareSphere sample staff seed for the current public.users schema.
+-- These rows create profile records for doctors, nurses, ward boys, and receptionists.
+-- Staff can later be linked to real Supabase Auth accounts using the signup flow or admin user creation.
 
-INSERT INTO Admins (Username, PasswordHash, Role) VALUES ('brisco.official@gmail.com', 'Usman.brisco123', 'admin');
-INSERT INTO Patient (PName, Gender, Email, PasswordHash, PhoneNo, Address) VALUES ('Ali Patient', 'Male', 'patient@caresphere.pk', 'password', '03001234567', 'DHA Phase 5, Lahore');
-INSERT INTO Receptionist (Name, Depid, Gender, Email, PasswordHash, PhoneNo) VALUES 
-('Sana Receptionist', 1, 'Female', 'recep1@caresphere.pk', 'password', '03219876543'),
-('Bilal Receptionist', 2, 'Male', 'recep2@caresphere.pk', 'password', '03219876544');
+with staff_seed (
+  name,
+  email,
+  role,
+  department,
+  gender,
+  shift,
+  shift_start,
+  shift_end,
+  qualification,
+  specialization,
+  experience,
+  salary,
+  phone
+) as (
+  values
+    ('Dr. Ayesha Khan', 'dr.ayesha.khan@caresphere.pk', 'doctor', 'Emergency', 'Female', 'Morning OPD', '09:00', '14:00', 'MBBS, FCPS', 'Emergency Medicine', 8, 350000, '03001110001'),
+    ('Dr. Bilal Ahmed', 'dr.bilal.ahmed@caresphere.pk', 'doctor', 'Emergency', 'Male', 'Evening OPD', '14:00', '20:00', 'MBBS, MCPS', 'Emergency Medicine', 6, 320000, '03001110002'),
+    ('Dr. Sana Iqbal', 'dr.sana.iqbal@caresphere.pk', 'doctor', 'Surgical', 'Female', 'Morning OPD', '09:00', '14:00', 'MBBS, FCPS', 'General Surgery', 9, 360000, '03002220001'),
+    ('Dr. Kamran Saleem', 'dr.kamran.saleem@caresphere.pk', 'doctor', 'Surgical', 'Male', 'Evening OPD', '14:00', '20:00', 'MBBS, MS', 'General Surgery', 7, 330000, '03002220002'),
+    ('Dr. Farah Sheikh', 'dr.farah.sheikh@caresphere.pk', 'doctor', 'Pediatrics', 'Female', 'Morning OPD', '09:00', '14:00', 'MBBS, DCH', 'Pediatrics', 10, 345000, '03003330001'),
+    ('Dr. Faisal Nawaz', 'dr.faisal.nawaz@caresphere.pk', 'doctor', 'Pediatrics', 'Male', 'Evening OPD', '14:00', '20:00', 'MBBS, FCPS', 'Pediatrics', 6, 315000, '03003330002'),
+    ('Dr. Hassan Saeed', 'dr.hassan.saeed@caresphere.pk', 'doctor', 'Orthopedics', 'Male', 'Morning OPD', '09:00', '14:00', 'MBBS, MS', 'Orthopedic Surgery', 11, 370000, '03004440001'),
+    ('Dr. Rabia Aslam', 'dr.rabia.aslam@caresphere.pk', 'doctor', 'Orthopedics', 'Female', 'Evening OPD', '14:00', '20:00', 'MBBS, FCPS', 'Orthopedics', 7, 335000, '03004440002'),
+    ('Dr. Khadija Rehman', 'dr.khadija.rehman@caresphere.pk', 'doctor', 'Radiology', 'Female', 'Morning Imaging', '09:00', '14:00', 'MBBS, FCPS', 'Radiology', 8, 355000, '03005550001'),
+    ('Dr. Waqas Munir', 'dr.waqas.munir@caresphere.pk', 'doctor', 'Radiology', 'Male', 'Evening Imaging', '14:00', '20:00', 'MBBS, MCPS', 'Radiology', 6, 325000, '03005550002'),
 
--- Emergency Doctors
-INSERT INTO Doctor (Name, Depid, Gender, Email, PasswordHash, Specialization, Experience) VALUES 
-('Dr. Tariq Mahmood', 1, 'Male', 'doc.tariq.mahmood@caresphere.pk', 'password', 'Emergency Specialist', 5),
-('Dr. Ayesha Khan', 1, 'Female', 'doc.ayesha.khan@caresphere.pk', 'password', 'Emergency Specialist', 6),
-('Dr. Usman Raza', 1, 'Male', 'doc.usman.raza@caresphere.pk', 'password', 'Emergency Specialist', 7),
-('Dr. Fatima Ali', 1, 'Female', 'doc.fatima.ali@caresphere.pk', 'password', 'Emergency Specialist', 8),
-('Dr. Bilal Ahmed', 1, 'Male', 'doc.bilal.ahmed@caresphere.pk', 'password', 'Emergency Specialist', 9);
+    ('Asma Tariq', 'nurse.asma.tariq@caresphere.pk', 'nurse', 'Emergency', 'Female', 'Morning Ward', '07:00', '15:00', 'RN, BSN', null, 5, 120000, '03111110001'),
+    ('Zainab Ali', 'nurse.zainab.ali@caresphere.pk', 'nurse', 'Emergency', 'Female', 'Evening Ward', '15:00', '23:00', 'RN', null, 4, 115000, '03111110002'),
+    ('Noreen Waqar', 'nurse.noreen.waqar@caresphere.pk', 'nurse', 'Surgical', 'Female', 'Morning Ward', '07:00', '15:00', 'RN, BSN', null, 6, 125000, '03112220001'),
+    ('Samina Gul', 'nurse.samina.gul@caresphere.pk', 'nurse', 'Surgical', 'Female', 'Evening Ward', '15:00', '23:00', 'RN', null, 5, 118000, '03112220002'),
+    ('Uzma Khalid', 'nurse.uzma.khalid@caresphere.pk', 'nurse', 'Pediatrics', 'Female', 'Morning Ward', '07:00', '15:00', 'RN, BSN', null, 7, 122000, '03113330001'),
+    ('Shazia Parveen', 'nurse.shazia.parveen@caresphere.pk', 'nurse', 'Pediatrics', 'Female', 'Evening Ward', '15:00', '23:00', 'RN', null, 5, 117000, '03113330002'),
+    ('Aneela Qadir', 'nurse.aneela.qadir@caresphere.pk', 'nurse', 'Orthopedics', 'Female', 'Morning Ward', '07:00', '15:00', 'RN, BSN', null, 6, 121000, '03114440001'),
+    ('Mehwish Hayat', 'nurse.mehwish.hayat@caresphere.pk', 'nurse', 'Orthopedics', 'Female', 'Evening Ward', '15:00', '23:00', 'RN', null, 4, 116000, '03114440002'),
+    ('Madiha Iftikhar', 'nurse.madiha.iftikhar@caresphere.pk', 'nurse', 'Radiology', 'Female', 'Morning Ward', '07:00', '15:00', 'RN, BSN', null, 5, 119000, '03115550001'),
+    ('Anum Fayyaz', 'nurse.anum.fayyaz@caresphere.pk', 'nurse', 'Radiology', 'Female', 'Evening Ward', '15:00', '23:00', 'RN', null, 4, 114000, '03115550002'),
 
--- Emergency Nurses
-INSERT INTO Nurse (NurseName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Asma Tariq', 1, 'Female', 'nurse.asma.tariq@caresphere.pk', 'password', 'Morning'),
-('Zainab Ali', 1, 'Female', 'nurse.zainab.ali@caresphere.pk', 'password', 'Night'),
-('Sadia Imran', 1, 'Female', 'nurse.sadia.imran@caresphere.pk', 'password', 'Morning'),
-('Maria Qasim', 1, 'Female', 'nurse.maria.qasim@caresphere.pk', 'password', 'Night'),
-('Kiran Shah', 1, 'Female', 'nurse.kiran.shah@caresphere.pk', 'password', 'Morning');
+    ('Ahmed Ali', 'wardboy.ahmed.ali@caresphere.pk', 'wardboy', 'Emergency', 'Male', 'Support Shift', '08:00', '17:00', null, null, 3, 65000, '03221110001'),
+    ('Hasan Zafar', 'wardboy.hasan.zafar@caresphere.pk', 'wardboy', 'Surgical', 'Male', 'Support Shift', '08:00', '17:00', null, null, 4, 67000, '03222220001'),
+    ('Zaid Hameed', 'wardboy.zaid.hameed@caresphere.pk', 'wardboy', 'Pediatrics', 'Male', 'Support Shift', '08:00', '17:00', null, null, 2, 62000, '03223330001'),
+    ('Sheheryar Munawar', 'wardboy.sheheryar.munawar@caresphere.pk', 'wardboy', 'Orthopedics', 'Male', 'Support Shift', '08:00', '17:00', null, null, 5, 69000, '03224440001'),
+    ('Danish Taimoor', 'wardboy.danish.taimoor@caresphere.pk', 'wardboy', 'Radiology', 'Male', 'Support Shift', '08:00', '17:00', null, null, 3, 64000, '03225550001'),
 
--- Emergency Wardboys
-INSERT INTO WardBoy (WardBName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Ahmed Ali', 1, 'Male', 'wardboy.ahmed.ali@caresphere.pk', 'password', 'Rotational'),
-('Ali Raza', 1, 'Male', 'wardboy.ali.raza@caresphere.pk', 'password', 'Rotational');
+    ('Sana Receptionist', 'reception.sana@caresphere.pk', 'receptionist', 'Emergency', 'Female', 'Front Desk', '08:00', '16:00', 'B.Com', null, 4, 90000, '03331110001'),
+    ('Bilal Receptionist', 'reception.bilal@caresphere.pk', 'receptionist', 'Surgical', 'Male', 'Front Desk', '12:00', '20:00', 'BBA', null, 5, 95000, '03332220001')
+)
+insert into public.users (
+  auth_user_id,
+  email,
+  name,
+  role,
+  department,
+  depid,
+  phone,
+  gender,
+  shift,
+  shift_start,
+  shift_end,
+  qualification,
+  specialization,
+  experience,
+  salary,
+  status,
+  auth_status,
+  removed_at
+)
+select
+  null::uuid,
+  lower(staff_seed.email),
+  staff_seed.name,
+  staff_seed.role,
+  staff_seed.department,
+  departments.id,
+  staff_seed.phone,
+  staff_seed.gender,
+  staff_seed.shift,
+  staff_seed.shift_start,
+  staff_seed.shift_end,
+  staff_seed.qualification,
+  staff_seed.specialization,
+  staff_seed.experience,
+  staff_seed.salary,
+  'Active',
+  'active',
+  null::timestamptz
+from staff_seed
+left join public.departments
+  on departments.name = staff_seed.department
+on conflict (email) do update
+set name = excluded.name,
+    role = excluded.role,
+    department = excluded.department,
+    depid = excluded.depid,
+    phone = excluded.phone,
+    gender = excluded.gender,
+    shift = excluded.shift,
+    shift_start = excluded.shift_start,
+    shift_end = excluded.shift_end,
+    qualification = excluded.qualification,
+    specialization = excluded.specialization,
+    experience = excluded.experience,
+    salary = excluded.salary,
+    status = 'Active',
+    auth_status = case
+      when public.users.auth_user_id is not null then public.users.auth_status
+      else excluded.auth_status
+    end,
+    removed_at = null,
+    updated_at = now();
 
--- Surgical Doctors
-INSERT INTO Doctor (Name, Depid, Gender, Email, PasswordHash, Specialization, Experience) VALUES 
-('Dr. Sana Iqbal', 2, 'Male', 'doc.sana.iqbal@caresphere.pk', 'password', 'Surgical Specialist', 5),
-('Dr. Imran Shah', 2, 'Female', 'doc.imran.shah@caresphere.pk', 'password', 'Surgical Specialist', 6),
-('Dr. Hira Qadri', 2, 'Male', 'doc.hira.qadri@caresphere.pk', 'password', 'Surgical Specialist', 7),
-('Dr. Kamran Saleem', 2, 'Female', 'doc.kamran.saleem@caresphere.pk', 'password', 'Surgical Specialist', 8),
-('Dr. Nadia Jamil', 2, 'Male', 'doc.nadia.jamil@caresphere.pk', 'password', 'Surgical Specialist', 9);
-
--- Surgical Nurses
-INSERT INTO Nurse (NurseName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Noreen Waqar', 2, 'Female', 'nurse.noreen.waqar@caresphere.pk', 'password', 'Morning'),
-('Samina Gul', 2, 'Female', 'nurse.samina.gul@caresphere.pk', 'password', 'Night'),
-('Lubna Javed', 2, 'Female', 'nurse.lubna.javed@caresphere.pk', 'password', 'Morning'),
-('Bushra Ansari', 2, 'Female', 'nurse.bushra.ansari@caresphere.pk', 'password', 'Night'),
-('Tayyaba Noor', 2, 'Female', 'nurse.tayyaba.noor@caresphere.pk', 'password', 'Morning');
-
--- Surgical Wardboys
-INSERT INTO WardBoy (WardBName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Hasan Zafar', 2, 'Male', 'wardboy.hasan.zafar@caresphere.pk', 'password', 'Rotational'),
-('Umar Farooq', 2, 'Male', 'wardboy.umar.farooq@caresphere.pk', 'password', 'Rotational');
-
--- Pediatrics Doctors
-INSERT INTO Doctor (Name, Depid, Gender, Email, PasswordHash, Specialization, Experience) VALUES 
-('Dr. Raza Malik', 3, 'Male', 'doc.raza.malik@caresphere.pk', 'password', 'Pediatrics Specialist', 5),
-('Dr. Farah Sheikh', 3, 'Female', 'doc.farah.sheikh@caresphere.pk', 'password', 'Pediatrics Specialist', 6),
-('Dr. Zahid Hussain', 3, 'Male', 'doc.zahid.hussain@caresphere.pk', 'password', 'Pediatrics Specialist', 7),
-('Dr. Nida Tariq', 3, 'Female', 'doc.nida.tariq@caresphere.pk', 'password', 'Pediatrics Specialist', 8),
-('Dr. Faisal Nawaz', 3, 'Male', 'doc.faisal.nawaz@caresphere.pk', 'password', 'Pediatrics Specialist', 9);
-
--- Pediatrics Nurses
-INSERT INTO Nurse (NurseName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Uzma Khalid', 3, 'Female', 'nurse.uzma.khalid@caresphere.pk', 'password', 'Morning'),
-('Shazia Parveen', 3, 'Female', 'nurse.shazia.parveen@caresphere.pk', 'password', 'Night'),
-('Rida Batool', 3, 'Female', 'nurse.rida.batool@caresphere.pk', 'password', 'Morning'),
-('Nida Zafar', 3, 'Female', 'nurse.nida.zafar@caresphere.pk', 'password', 'Night'),
-('Sonia Majeed', 3, 'Female', 'nurse.sonia.majeed@caresphere.pk', 'password', 'Morning');
-
--- Pediatrics Wardboys
-INSERT INTO WardBoy (WardBName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Zaid Hameed', 3, 'Male', 'wardboy.zaid.hameed@caresphere.pk', 'password', 'Rotational'),
-('Hamza Abbasi', 3, 'Male', 'wardboy.hamza.abbasi@caresphere.pk', 'password', 'Rotational');
-
--- Orthopedics Doctors
-INSERT INTO Doctor (Name, Depid, Gender, Email, PasswordHash, Specialization, Experience) VALUES 
-('Dr. Hassan Saeed', 4, 'Male', 'doc.hassan.saeed@caresphere.pk', 'password', 'Orthopedics Specialist', 5),
-('Dr. Amna Dar', 4, 'Female', 'doc.amna.dar@caresphere.pk', 'password', 'Orthopedics Specialist', 6),
-('Dr. Salman Qureshi', 4, 'Male', 'doc.salman.qureshi@caresphere.pk', 'password', 'Orthopedics Specialist', 7),
-('Dr. Rabia Aslam', 4, 'Female', 'doc.rabia.aslam@caresphere.pk', 'password', 'Orthopedics Specialist', 8),
-('Dr. Shoaib Akhtar', 4, 'Male', 'doc.shoaib.akhtar@caresphere.pk', 'password', 'Orthopedics Specialist', 9);
-
--- Orthopedics Nurses
-INSERT INTO Nurse (NurseName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Aneela Qadir', 4, 'Female', 'nurse.aneela.qadir@caresphere.pk', 'password', 'Morning'),
-('Mehwish Hayat', 4, 'Female', 'nurse.mehwish.hayat@caresphere.pk', 'password', 'Night'),
-('Ayesha Omer', 4, 'Female', 'nurse.ayesha.omer@caresphere.pk', 'password', 'Morning'),
-('Humaira Chohan', 4, 'Female', 'nurse.humaira.chohan@caresphere.pk', 'password', 'Night'),
-('Saba Qamar', 4, 'Female', 'nurse.saba.qamar@caresphere.pk', 'password', 'Morning');
-
--- Orthopedics Wardboys
-INSERT INTO WardBoy (WardBName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Sheheryar Munawar', 4, 'Male', 'wardboy.sheheryar.munawar@caresphere.pk', 'password', 'Rotational'),
-('Fahad Mustafa', 4, 'Male', 'wardboy.fahad.mustafa@caresphere.pk', 'password', 'Rotational');
-
--- Radiology Doctors
-INSERT INTO Doctor (Name, Depid, Gender, Email, PasswordHash, Specialization, Experience) VALUES 
-('Dr. Khadija Rehman', 5, 'Male', 'doc.khadija.rehman@caresphere.pk', 'password', 'Radiology Specialist', 5),
-('Dr. Waqas Munir', 5, 'Female', 'doc.waqas.munir@caresphere.pk', 'password', 'Radiology Specialist', 6),
-('Dr. Marium Riaz', 5, 'Male', 'doc.marium.riaz@caresphere.pk', 'password', 'Radiology Specialist', 7),
-('Dr. Junaid Safdar', 5, 'Female', 'doc.junaid.safdar@caresphere.pk', 'password', 'Radiology Specialist', 8),
-('Dr. Sahar Zaman', 5, 'Male', 'doc.sahar.zaman@caresphere.pk', 'password', 'Radiology Specialist', 9);
-
--- Radiology Nurses
-INSERT INTO Nurse (NurseName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Madiha Iftikhar', 5, 'Female', 'nurse.madiha.iftikhar@caresphere.pk', 'password', 'Morning'),
-('Anum Fayyaz', 5, 'Female', 'nurse.anum.fayyaz@caresphere.pk', 'password', 'Night'),
-('Sanam Jung', 5, 'Female', 'nurse.sanam.jung@caresphere.pk', 'password', 'Morning'),
-('Maya Ali', 5, 'Female', 'nurse.maya.ali@caresphere.pk', 'password', 'Night'),
-('Mahira Khan', 5, 'Female', 'nurse.mahira.khan@caresphere.pk', 'password', 'Morning');
-
--- Radiology Wardboys
-INSERT INTO WardBoy (WardBName, Depid, Gender, Email, PasswordHash, Shift) VALUES 
-('Danish Taimoor', 5, 'Male', 'wardboy.danish.taimoor@caresphere.pk', 'password', 'Rotational'),
-('Imran Abbas', 5, 'Male', 'wardboy.imran.abbas@caresphere.pk', 'password', 'Rotational');
+select role, department, count(*) as total_staff
+from public.users
+where role in ('doctor', 'nurse', 'wardboy', 'receptionist')
+group by role, department
+order by role, department;
