@@ -46,8 +46,8 @@ Create a `.env` file in the project root:
 ```env
 VITE_SUPABASE_URL=https://jbxvbmrfcwjpcleamafu.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_yInf-fu43Q-04yNoC94jHg_BdFsMsCe
-VITE_PRIMARY_ADMIN_NAME=Sehar
-VITE_PRIMARY_ADMIN_EMAIL=seharmeharnsj@gmail.com
+VITE_PRIMARY_ADMIN_NAME=Primary Admin
+VITE_PRIMARY_ADMIN_EMAIL=primary-admin@example.com
 VITE_SIGNUP_REDIRECT_URL=http://localhost:5173/login
 VITE_PASSWORD_RESET_URL=http://localhost:5173/reset-password
 ```

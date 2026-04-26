@@ -7,8 +7,6 @@ import './SharedPages.css';
 
 const Users = () => {
   const { users, user, departments, addUser, removeUser, updateUserRole, updateUserDetails } = useAuth();
-  const primaryAdminEmail = (import.meta.env.VITE_PRIMARY_ADMIN_EMAIL || '').trim().toLowerCase();
-  const primaryAdminName = (import.meta.env.VITE_PRIMARY_ADMIN_NAME || 'Primary Admin').trim() || 'Primary Admin';
   
   const [formData, setFormData] = useState({ name: '', username: '', password: '', role: ROLES.PATIENT });
   const [selectedUser, setSelectedUser] = useState(null);
@@ -200,7 +198,7 @@ const Users = () => {
                   New staff accounts receive a confirmation email from Supabase. Ask the user to check inbox or spam and confirm before first login.
                 </p>
                 <p style={{marginTop: '10px', fontSize: '0.88rem', color: '#475569', lineHeight: 1.5}}>
-                  Primary admin is locked to {primaryAdminName}{primaryAdminEmail ? ` (${primaryAdminEmail})` : ''}. Create all other staff accounts here.
+                  Primary admin access is managed separately. Create all other staff accounts here.
                 </p>
               </form>
             </div>

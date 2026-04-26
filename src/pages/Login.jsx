@@ -7,7 +7,6 @@ import Loader from '../components/Loader';
 import './SharedPages.css';
 
 const Login = () => {
-  const hasPrimaryAdmin = Boolean((import.meta.env.VITE_PRIMARY_ADMIN_EMAIL || '').trim());
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -90,7 +89,7 @@ const Login = () => {
           </button>
 
           <p style={{textAlign: 'center', color: '#94a3b8', fontSize: '0.92rem', marginBottom: '15px'}}>
-            New users sign up first{hasPrimaryAdmin ? '. Admin uses reserved email.' : '.'}
+            New users sign up first. Admin access is managed separately.
           </p>
 
           <p style={{textAlign: 'center', marginBottom: '8px'}}>
