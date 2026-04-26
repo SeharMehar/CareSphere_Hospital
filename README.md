@@ -37,7 +37,7 @@ CareSphere is a comprehensive, real-time Hospital Management System built with *
 ### 1. Clone & Install
 ```bash
 git clone https://github.com/SeharMehar/CareSphere_Hospital.git
-cd caresphere
+cd CareSphere_Hospital
 npm install
 ```
 
@@ -59,7 +59,10 @@ Run the following SQL scripts in your **Supabase SQL Editor**, in order:
 ```bash
 npm run dev
 ```
-Open [ http://localhost:5173/CareSphere_Hospital/]( http://localhost:5173/CareSphere_Hospital/) in your browser.
+Open http://localhost:5173/ in your browser after the dev server starts.
+
+If you want to open the deployed GitHub Pages site, use:
+https://seharmehar.github.io/CareSphere_Hospital/
 
 ---
 
