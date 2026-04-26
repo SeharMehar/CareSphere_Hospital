@@ -52,7 +52,6 @@ const getDefaultShiftLabel = (role) => {
 const SignUp = () => {
   const { signup, departments } = useAuth();
   const navigate = useNavigate();
-  const primaryAdminEmail = (import.meta.env.VITE_PRIMARY_ADMIN_EMAIL || '').trim().toLowerCase();
   const [formData, setFormData] = useState({
     role: ROLES.PATIENT,
     name: '',
@@ -173,8 +172,7 @@ const SignUp = () => {
         <div className="signup-section-banner">
           <strong>Choose Role</strong>
           <span>
-            Email verification required.
-            {primaryAdminEmail ? ` Admin stays locked to ${primaryAdminEmail}.` : ''}
+            Email verification required. Admin access is managed separately.
           </span>
         </div>
 
