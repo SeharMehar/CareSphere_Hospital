@@ -5,10 +5,29 @@
     <link rel="icon" type="image/svg+xml" href="/CareSphere_Hospital/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>caresphere</title>
-    <script type="module" crossorigin src="/CareSphere_Hospital/assets/index-Cb9CrVUY.js"></script>
+    <script type="module" crossorigin src="/CareSphere_Hospital/assets/index-DcfnbM9z.js"></script>
     <link rel="stylesheet" crossorigin href="/CareSphere_Hospital/assets/index-CQjlmRm6.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div
+        id="app-loading"
+        style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:#f4f7f6;color:#112A46;font-family:Segoe UI,Arial,sans-serif;text-align:center;"
+      >
+        <h1 style="margin:0 0 12px;font-size:clamp(2rem,5vw,3rem);">CareSphere</h1>
+        <p style="margin:0 0 8px;font-size:1rem;">Loading hospital portal...</p>
+        <p id="app-loading-help" style="display:none;max-width:420px;margin:16px 0 0;color:#475569;line-height:1.5;">
+          The app is taking longer than expected to load. Try a hard refresh with Ctrl+F5 or reopen this link in an incognito tab.
+        </p>
+      </div>
+    </div>
+    <script>
+      window.__CARESPHERE_APP_MOUNTED__ = false;
+      window.setTimeout(function () {
+        if (window.__CARESPHERE_APP_MOUNTED__) return;
+        var help = document.getElementById('app-loading-help');
+        if (help) help.style.display = 'block';
+      }, 4000);
+    </script>
   </body>
 </html>
