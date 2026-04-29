@@ -1,4 +1,5 @@
 import { ROLES } from './dummyData';
+import { buildAppUrl } from './appUrl';
 import { supabase } from './supabaseClient';
 
 const AUTH_STATES = {
@@ -127,18 +128,50 @@ const combineAppointmentDate = (dateValue, timeValue) => {
   return dateValue || null;
 };
 
-const getSignupRedirectUrl = () => import.meta.env.VITE_SIGNUP_REDIRECT_URL || undefined;
+const resolveEnvRedirectUrl = (value) => {
+  const trimmedValue = value?.trim();
+  if (!trimmedValue) {
+    return null;
+  }
 
-const getPasswordResetRedirectUrl = () => {
-  if (import.meta.env.VITE_PASSWORD_RESET_URL) {
-    return import.meta.env.VITE_PASSWORD_RESET_URL;
+  if (import.meta.env.PROD) {
+    try {
+      const parsedUrl = new URL(trimmedValue);
+      if (['localhost', '127.0.0.1'].includes(parsedUrl.hostname)) {
+        return null;
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  return trimmedValue;
+};
+
+const getSignupRedirectUrl = () => {
+  const configuredUrl = resolveEnvRedirectUrl(import.meta.env.VITE_SIGNUP_REDIRECT_URL);
+  if (configuredUrl) {
+    return configuredUrl;
   }
 
   if (typeof window === 'undefined') {
     return undefined;
   }
 
-  return `${window.location.origin}/reset-password`;
+  return buildAppUrl('/login');
+};
+
+const getPasswordResetRedirectUrl = () => {
+  const configuredUrl = resolveEnvRedirectUrl(import.meta.env.VITE_PASSWORD_RESET_URL);
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return buildAppUrl('/reset-password');
 };
 
 const restorePreviousSession = async (previousSession) => {

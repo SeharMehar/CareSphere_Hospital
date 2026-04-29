@@ -14,7 +14,6 @@ const Users = () => {
   const [filterRole, setFilterRole] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Safety: if auth user is not loaded yet, show loading
   if (!user || !user.role) {
     return <Loader fullScreen={false} text="Loading user data..." />;
   }
@@ -23,7 +22,6 @@ const Users = () => {
     return <div>Access Denied</div>;
   }
 
-  // Safe users list - filter out any null/undefined entries
   const safeUsers = Array.isArray(users) ? users.filter(u => u != null && typeof u === 'object') : [];
   const activeAdmin = safeUsers.find(u => u.role === ROLES.ADMIN && u.status !== 'Removed');
 
