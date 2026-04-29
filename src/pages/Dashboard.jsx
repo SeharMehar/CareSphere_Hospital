@@ -299,14 +299,14 @@ const AdminView = () => {
           </div>
           <p><strong>Name:</strong> {selectedApp.name}</p>
           <p><strong>Email:</strong> {selectedApp.email}</p>
-          <p><strong>Role:</strong> <span style={{textTransform: 'capitalize'}}>{selectedApp.role}</span></p>
+          <p><strong>Track / Type:</strong> <span style={{textTransform: 'capitalize'}}>{selectedApp.role}</span></p>
           <p><strong>Department:</strong> {selectedApp.department || 'N/A'}</p>
-          <p><strong>License Number:</strong> {selectedApp.licensenumber || 'N/A'}</p>
-          <p><strong>Years Experience:</strong> {selectedApp.yearsexperience || '0'}</p>
-          <p><strong>Shift Preference:</strong> {selectedApp.shiftpreference || 'N/A'}</p>
-          <p><strong>Languages:</strong> {selectedApp.languages || 'N/A'}</p>
+          <p><strong>Reference ID:</strong> {selectedApp.licensenumber || 'N/A'}</p>
+          <p><strong>Experience / Year:</strong> {selectedApp.yearsexperience || '0'}</p>
+          <p><strong>Availability:</strong> {selectedApp.shiftpreference || 'N/A'}</p>
+          <p><strong>Skills / Languages:</strong> {selectedApp.languages || 'N/A'}</p>
           <div style={{marginTop: '20px'}}>
-            <strong>Cover Letter:</strong>
+            <strong>Purpose Note:</strong>
             <p style={{background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', whiteSpace: 'pre-wrap', marginTop: '10px'}}>{selectedApp.coverletter || 'No cover letter provided.'}</p>
           </div>
           <div style={{display: 'flex', gap: '10px', marginTop: '30px', borderTop: '1px solid #e2e8f0', paddingTop: '20px'}}>
@@ -331,14 +331,14 @@ const AdminView = () => {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
       <StatCard title="Total Staff" value={users.filter(u => u.role !== ROLES.PATIENT).length.toString()} />
       <StatCard title="Active Wards" value={wards.length.toString()} />
-      <StatCard title="Pending Waitlist" value={applications.filter(a => a.status === 'Pending').length.toString()} color="#00b4db" />
+      <StatCard title="Pending Requests" value={applications.filter(a => a.status === 'Pending').length.toString()} color="#00b4db" />
     </div>
     
     <WardDataDisplay canEdit={true} />
 
     <div style={{ marginTop: '40px' }}>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f0f0f0', paddingBottom: '10px', marginBottom: '0'}}>
-        <h4 style={{color: '#112A46', fontSize: '1.4rem', margin: 0}}>Staff Applications</h4>
+        <h4 style={{color: '#112A46', fontSize: '1.4rem', margin: 0}}>Program Requests</h4>
         <span style={{fontSize: '0.85rem', color: '#888'}}>
           {applications.filter(a => a.status === 'Pending').length} pending · {applications.length} total
         </span>
@@ -351,7 +351,7 @@ const AdminView = () => {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Role</th>
+                  <th>Track</th>
                   <th>Department</th>
                   <th>Status</th>
                   <th>Action</th>

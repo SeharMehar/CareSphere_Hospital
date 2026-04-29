@@ -13,7 +13,7 @@ const Navbar = () => {
         <Link to="/appointment" className="nav-link">Appointment</Link>
         <Link to="/login" className="nav-link">Login</Link>
         <Link to="/signup" className="nav-link">Sign Up</Link>
-        <Link to="/apply" className="nav-link nav-btn">Join CareSphere</Link>
+        <Link to="/apply" className="nav-link nav-btn">Clinical Programs</Link>
       </div>
     </nav>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Loader from '../components/Loader';
@@ -14,13 +14,18 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectPath =
+    typeof location.state?.from === 'string' && location.state.from
+      ? location.state.from
+      : '/dashboard';
 
   // Redirect if already logged in
   React.useEffect(() => {
     if (!loading && user) {
-      navigate('/dashboard', { replace: true });
+      navigate(redirectPath, { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, redirectPath]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
